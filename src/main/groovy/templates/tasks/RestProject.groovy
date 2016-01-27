@@ -130,6 +130,18 @@ class RestProject {
 
         File buildFile = basicProject.getProjectFileOrFail("build.gradle")
         FileUtils.appendAfterLine(buildFile, "mainTestCompile", /    mainTestCompile project(":${moduleName}")/)
+
+        basicProject.applyTemplate("src/main/java/${servicePackagePath}/config") {
+            "JerseyConfig.java" template: "/templates/springboot/rest/jersey-config.java.tmpl",
+                                servicePackage: "${servicePackage}"
+        }
+
+        basicProject.applyTemplate("src/main/java/${servicePackagePath}/config") {
+            "JerseyConfig.java" template: "/templates/springboot/rest/jersey-config.java.tmpl",
+                                servicePackage: "${servicePackage}"
+        }
+
+        basicProject.commitProjectFiles("springboot rest bootstrap")
     }
 
     private Object addModuleToGradleSettings(String moduleName) {

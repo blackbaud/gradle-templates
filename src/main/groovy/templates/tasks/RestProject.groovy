@@ -136,6 +136,11 @@ class RestProject {
                                 servicePackage: "${servicePackage}"
         }
 
+        basicProject.applyTemplate("src/main/java/${servicePackagePath}/config") {
+            "JerseyConfig.java" template: "/templates/springboot/rest/jersey-config.java.tmpl",
+                                servicePackage: "${servicePackage}"
+        }
+
         basicProject.commitProjectFiles("springboot rest bootstrap")
     }
 

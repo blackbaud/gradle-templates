@@ -27,7 +27,7 @@ class RestProject {
 
     void initRestProject(boolean postgres) {
         basicProject.initGradleProject()
-        createRestBase()
+        createRestBase(postgres)
         if (postgres) {
             DatasourceProject datasourceProject = new DatasourceProject(basicProject)
             datasourceProject.initPostgres()
@@ -54,11 +54,12 @@ class RestProject {
         }
     }
 
-    private void createRestBase() {
+    private void createRestBase(boolean postgres) {
         addResourcePaths()
+        String entityScan = postgres ? "\n@EntityScan({\"${servicePackage}\", \"com.blackbaud.boot.converters\"})" : ''
         basicProject.applyTemplate("src/main/java/${servicePackagePath}") {
             "${serviceName}.java" template: "/templates/springboot/application-class.java.tmpl",
-                    serviceName: serviceName, servicePackage: servicePackage
+                    serviceName: serviceName, servicePackage: servicePackage, entityScan: entityScan
         }
 
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/config") {

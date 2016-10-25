@@ -32,11 +32,17 @@ dependencies {
 
     clientCompile "com.blackbaud:common-spring-boot-rest:\${springBootVersion}-2.+"
 
+    mainTestCompile "com.blackbaud:common-spring-boot-rest-test:\${springBootVersion}-2.+"
     mainTestCompile "com.blackbaud:common-test:1.+"
     mainTestCompile "org.codehaus.groovy:groovy-all:2.4.3"
     mainTestCompile ("org.spockframework:spock-spring:1.0-groovy-2.4") {
         exclude group: "org.codehaus.groovy"
     }
+
+    testCompile ('org.spockframework:spock-spring:1.0-groovy-2.4') {
+        exclude group: 'org.codehaus.groovy'
+    }
+    testCompile "org.springframework.boot:spring-boot-starter-test"
 
     componentTestCompile "org.springframework.boot:spring-boot-starter-test"
     componentTestCompile "com.blackbaud:common-spring-boot-rest-test:\${springBootVersion}-2.+"

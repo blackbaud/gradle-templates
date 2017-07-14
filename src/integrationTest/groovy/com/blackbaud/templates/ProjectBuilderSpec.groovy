@@ -1,24 +1,22 @@
 package com.blackbaud.templates
 
+import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import java.util.stream.Collectors
 
-class BlackbaudTemplatesSpec extends Specification {
+class ProjectBuilderSpec extends Specification {
 
     private String gradleVersion = "2.14.1-bb.1.0"
+
+    @Rule
     private TemporaryFolder rootFolder
 
     def setup() {
-        rootFolder = new TemporaryFolder();
-        rootFolder.create()
         GitRepo.init(rootFolder.root)
     }
 
-    def cleanup() {
-        rootFolder.delete()
-    }
 
     def "should be able to create a basic project"() {
         given:

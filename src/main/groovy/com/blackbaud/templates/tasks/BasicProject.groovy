@@ -16,14 +16,14 @@ class BasicProject {
     private GitRepo gitRepo
     private File targetDir
     String repoName
-
     private String blackbaudGradleVersion
+    private ProjectProps projectProps
 
     BasicProject(ProjectProps projectProps, GitRepo gitRepo) {
         this.gitRepo = gitRepo
         this.repoName = gitRepo.repoDir.name
         this.targetDir = gitRepo.repoDir
-        this.blackbaudGradleVersion = projectProps.getRequiredProjectProperty("blackbaudGradleVersion")
+        this.projectProps = projectProps
     }
 
     BasicProject(String blackbaudGradleVersion, GitRepo gitRepo) {
@@ -95,8 +95,19 @@ class BasicProject {
     private void replaceGradleWrapperDistributionUrl() {
         File gradleWrapperProperties = new File(repoDir, "gradle/wrapper/gradle-wrapper.properties")
         String text = gradleWrapperProperties.text
+        String blackbaudGradleVersion = getBlackbaudGradleVersion()
         String distributionUrl = "https://nexus-oscf-dev.blackbaudcloud.com/content/repositories/releases/com/blackbaud/gradle-blackbaud/${blackbaudGradleVersion}/gradle-blackbaud-${blackbaudGradleVersion}-bin.zip"
         gradleWrapperProperties.text = text.replaceFirst(/(?m)^distributionUrl=.*/, /distributionUrl=${distributionUrl}/)
+    }
+
+    private String getBlackbaudGradleVersion() {
+        if (this.blackbaudGradleVersion != null) {
+            return this.blackbaudGradleVersion
+        } else if (this.projectProps != null) {
+            return projectProps.getRequiredProjectProperty("blackbaudGradleVersion")
+        } else {
+            throw new RuntimeException("Missing property blackbaudGradleVersion!")
+        }
     }
 
     private void initGradleWrapper() {

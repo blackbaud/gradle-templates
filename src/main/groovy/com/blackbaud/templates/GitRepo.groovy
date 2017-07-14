@@ -1,4 +1,4 @@
-package templates
+package com.blackbaud.templates
 
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.StoredConfig

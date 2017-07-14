@@ -1,11 +1,11 @@
-package templates.tasks
+package com.blackbaud.templates.tasks
 
 import org.gradle.api.GradleException
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
-import templates.GitRepo
-import templates.ProjectProps
-import templates.ProjectTemplate
+import com.blackbaud.templates.GitRepo
+import com.blackbaud.templates.ProjectProps
+import com.blackbaud.templates.ProjectTemplate
 
 import static com.google.common.base.CaseFormat.LOWER_HYPHEN
 import static com.google.common.base.CaseFormat.UPPER_CAMEL

@@ -1,6 +1,6 @@
-package templates
+package com.blackbaud.templates
 
-import templates.tasks.BasicProject
+import com.blackbaud.templates.tasks.BasicProject
 
 class BasicProjectBuilder {
 

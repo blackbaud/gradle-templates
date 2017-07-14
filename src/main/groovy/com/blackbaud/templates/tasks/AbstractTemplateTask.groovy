@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-package templates.tasks
+package com.blackbaud.templates.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
-import templates.GitRepo
-import templates.ProjectProps
-import templates.BlackbaudTemplatesPlugin
+import com.blackbaud.templates.GitRepo
+import com.blackbaud.templates.ProjectProps
+import com.blackbaud.templates.BlackbaudTemplatesPlugin
 
 /**
  * Abstract base class for project tasks.

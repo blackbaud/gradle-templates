@@ -1,7 +1,7 @@
-package templates
+package com.blackbaud.templates
 
-import templates.tasks.BasicProject
-import templates.tasks.RestProject
+import com.blackbaud.templates.tasks.BasicProject
+import com.blackbaud.templates.tasks.RestProject
 
 class RestProjectBuilder {
 

@@ -1,3 +1,6 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 buildscript {
     dependencies {
         classpath "com.blackbaud:gradle-internal:3.+"
@@ -9,11 +12,11 @@ apply plugin: "blackbaud-templates"
 apply plugin: "integration-test"
 
 dependencies {
-    compile gradleApi()
+    compileOnly gradleApi()
     compile localGroovy()
     compile 'com.google.guava:guava:18.0'
     compile 'org.eclipse.jgit:org.eclipse.jgit:4.0.2.201509141540-r'
-    compile 'org.gradle:gradle-tooling-api:2.1'
+    compile "org.gradle:gradle-tooling-api:${parseGradleVersionFromWrapperProps()}"
 
     testCompile gradleTestKit()
     testCompile ('com.blackbaud:gradle-internal-test:3.+') {
@@ -26,3 +29,14 @@ dependencies {
 }
 
 check.dependsOn integrationTest
+
+def parseGradleVersionFromWrapperProps() {
+    def  props = new Properties();
+    File propFile = new File('gradle/wrapper/gradle-wrapper.properties')
+    props.load(propFile.newDataInputStream())
+    String distUrl = props.getProperty('distributionUrl')
+    Pattern pattern = Pattern.compile("gradle-blackbaud\\/(.*)-bb.[0-9].[0-9]\\/gradle-blackbaud");
+    Matcher matcher = pattern.matcher(distUrl);
+    matcher.find()
+    return matcher.group(1)
+}

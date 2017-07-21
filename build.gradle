@@ -11,6 +11,8 @@ apply plugin: "blackbaud-internal"
 apply plugin: "blackbaud-templates"
 apply plugin: "integration-test"
 
+println "Using gradle version: ${parseGradleVersionFromWrapperProps()}"
+
 dependencies {
     compileOnly gradleApi()
     compile localGroovy()
@@ -31,6 +33,7 @@ dependencies {
 check.dependsOn integrationTest
 
 def parseGradleVersionFromWrapperProps() {
+  try {
     def  props = new Properties();
     File propFile = new File('gradle/wrapper/gradle-wrapper.properties')
     props.load(propFile.newDataInputStream())
@@ -39,4 +42,7 @@ def parseGradleVersionFromWrapperProps() {
     Matcher matcher = pattern.matcher(distUrl);
     matcher.find()
     return matcher.group(1)
+  } catch (Exception ex) {
+    throw new RuntimeException("Failed to parse gradle version from gradlle-wrapper.properties. Please ensure distributionUrl is set!")
+  }
 }

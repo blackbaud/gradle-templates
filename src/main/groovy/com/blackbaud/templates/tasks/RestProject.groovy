@@ -186,7 +186,7 @@ class RestProject {
         println "********************************************************"
     }
 
-    void createCrudResource(String resourceName, boolean addEntity) {
+    void createCrudResource(String resourceName, boolean addEntity, boolean addWireSpec) {
         String resourcePath = "${UPPER_CAMEL.to(LOWER_UNDERSCORE, resourceName)}"
         String resourceVarName = "${resourcePath.toUpperCase()}_PATH"
         String resourceNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, resourceName)
@@ -203,9 +203,12 @@ class RestProject {
         basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
             "${resourceName}ResourceSpec.groovy" template: "/templates/springboot/rest/resource-spec.groovy.tmpl",
                     resourceName: resourceName, servicePackage: "${servicePackage}"
-
-            "${resourceName}ResourceWireSpec.groovy" template: "/templates/springboot/rest/resource-wirespec.groovy.tmpl",
-                    resourceName: resourceName, servicePackage: "${servicePackage}"
+        }
+        if (addWireSpec) {
+            basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
+                "${resourceName}ResourceWireSpec.groovy" template: "/templates/springboot/rest/resource-wirespec.groovy.tmpl",
+                        resourceName: resourceName, servicePackage: "${servicePackage}"
+            }
         }
         File testConfig = basicProject.findFile("TestConfig.java")
         FileUtils.appendAfterLine(testConfig, /import.*/,
@@ -266,7 +269,7 @@ import ${servicePackage}.client.${resourceName}Client;
         }
     }
 
-    void createBasicResource(String resourceName) {
+    void createBasicResource(String resourceName, boolean addWireSpec) {
         String resourcePath = "${UPPER_CAMEL.to(LOWER_UNDERSCORE, resourceName)}"
         String resourceVarName = "${resourcePath.toUpperCase()}_PATH"
         String resourceNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, resourceName)
@@ -283,9 +286,12 @@ import ${servicePackage}.client.${resourceName}Client;
         basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
             "${resourceName}ResourceSpec.groovy" template: "/templates/springboot/rest/resource-spec.groovy.tmpl",
                     resourceName: resourceName, servicePackage: "${servicePackage}"
-
-            "${resourceName}ResourceWireSpec.groovy" template: "/templates/springboot/rest/resource-wirespec.groovy.tmpl",
-                    resourceName: resourceName, servicePackage: "${servicePackage}"
+        }
+        if (addWireSpec) {
+            basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
+                "${resourceName}ResourceWireSpec.groovy" template: "/templates/springboot/rest/resource-wirespec.groovy.tmpl",
+                        resourceName: resourceName, servicePackage: "${servicePackage}"
+            }
         }
         File testConfig = basicProject.findFile("TestConfig.java")
         FileUtils.appendAfterLine(testConfig, /import.*/,

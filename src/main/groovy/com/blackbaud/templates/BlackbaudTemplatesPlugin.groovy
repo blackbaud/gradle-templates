@@ -16,6 +16,7 @@
  */
 package com.blackbaud.templates
 
+import com.blackbaud.templates.tasks.CreateBasicResourceTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import com.blackbaud.templates.tasks.AddKafkaContainerTask
@@ -43,6 +44,7 @@ class BlackbaudTemplatesPlugin implements Plugin<Project> {
         }
 
         project.task 'createCrudResource', type: CreateCrudResourceTask
+        project.task 'createBasicResource', type: CreateBasicResourceTask
         project.task 'createRestEmbeddedService', type: CreateEmbeddedServiceTask
         project.task 'addPostgresContainer', type: AddPostgresContainerTask
         project.task 'addKafkaContainer', type: AddKafkaContainerTask

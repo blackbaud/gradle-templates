@@ -26,8 +26,6 @@ spring.datasource.test-on-borrow=true
 spring.datasource.validation-interval=30000
 spring.datasource.validation-query=SELECT 1;
 """)
-
-        createLiquibaseChangeLog()
     }
 
     private createLiquibaseChangeLog() {

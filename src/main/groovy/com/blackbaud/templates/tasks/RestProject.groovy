@@ -79,6 +79,8 @@ class RestProject {
     void initKafka() {
         KafkaProject kafkaProject = new KafkaProject(basicProject)
         kafkaProject.initKafka()
+
+        basicProject.commitProjectFiles("initialize kafka")
     }
 
     private void createRestBase() {
@@ -262,6 +264,45 @@ import ${servicePackage}.client.${resourceName}Client;
             DatasourceProject datasourceProject = new DatasourceProject(basicProject)
             datasourceProject.addCreateTableScript(resourcePath)
         }
+    }
+
+    void createBasicResource(String resourceName) {
+        String resourcePath = "${UPPER_CAMEL.to(LOWER_UNDERSCORE, resourceName)}"
+        String resourceVarName = "${resourcePath.toUpperCase()}_PATH"
+        String resourceNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, resourceName)
+
+        addResourcePathConstant(resourcePath, resourceVarName)
+        basicProject.applyTemplate("src/main/java/${servicePackagePath}/resources") {
+            "${resourceName}Resource.java" template: "/templates/springboot/rest/resource-basic.java.tmpl",
+                    resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
+        }
+        basicProject.applyTemplate("src/main/java/${servicePackagePath}/client") {
+            "${resourceName}Client.java" template: "/templates/springboot/rest/resource-basic-client.java.tmpl",
+                                         resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
+        }
+        basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
+            "${resourceName}ResourceSpec.groovy" template: "/templates/springboot/rest/resource-spec.groovy.tmpl",
+                    resourceName: resourceName, servicePackage: "${servicePackage}"
+
+            "${resourceName}ResourceWireSpec.groovy" template: "/templates/springboot/rest/resource-wirespec.groovy.tmpl",
+                    resourceName: resourceName, servicePackage: "${servicePackage}"
+        }
+        File testConfig = basicProject.findFile("TestConfig.java")
+        FileUtils.appendAfterLine(testConfig, /import.*/,
+                                  """import org.springframework.context.annotation.Bean;
+import ${servicePackage}.client.${resourceName}Client;
+"""
+
+        )
+        FileUtils.appendToClass(testConfig, """
+
+    @Bean
+    public ${resourceName}Client ${resourceNameLowerCamel}Client() {
+        return testClientSupport().createClientWithTestToken(${resourceName}Client.builder());
+    }
+""")
+
+        FileUtils.appendAfterLine(basicProject.findFile("JerseyConfig.java"), /packages\s*\(/, "        packages(\"${servicePackage}.resources\");")
     }
 
     private void addResourcePathConstant(String resourcePath, String resourceVarName) {

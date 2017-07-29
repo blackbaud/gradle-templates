@@ -44,7 +44,7 @@ public class RestProjectSpec extends AbstractProjectSpecification {
         restProject.initRestProject()
         restProject.initPostgres()
         restProject.initKafka()
-        restProject.createRestResource("Fubar", true)
+        restProject.createCrudResource("Fubar", true)
         testGradleBuild.initBuildscriptPluginPathString()
 
         when:

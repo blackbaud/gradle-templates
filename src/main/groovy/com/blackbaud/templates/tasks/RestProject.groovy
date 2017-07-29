@@ -173,7 +173,7 @@ class RestProject {
 
     void createEmbeddedService(boolean addEntity) {
         addResourcePaths()
-        createRestResource(serviceName, addEntity)
+        createCrudResource(serviceName, addEntity)
 
         println "********************************************************"
         println "********************************************************"
@@ -184,18 +184,18 @@ class RestProject {
         println "********************************************************"
     }
 
-    void createRestResource(String resourceName, boolean addEntity) {
+    void createCrudResource(String resourceName, boolean addEntity) {
         String resourcePath = "${UPPER_CAMEL.to(LOWER_UNDERSCORE, resourceName)}"
         String resourceVarName = "${resourcePath.toUpperCase()}_PATH"
         String resourceNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, resourceName)
 
         addResourcePathConstant(resourcePath, resourceVarName)
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/resources") {
-            "${resourceName}Resource.java" template: "/templates/springboot/rest/resource.java.tmpl",
+            "${resourceName}Resource.java" template: "/templates/springboot/rest/resource-crud.java.tmpl",
                     resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
         }
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/client") {
-            "${resourceName}Client.java" template: "/templates/springboot/rest/resource-client.java.tmpl",
+            "${resourceName}Client.java" template: "/templates/springboot/rest/resource-crud-client.java.tmpl",
                                          resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
         }
         basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
@@ -216,8 +216,7 @@ import ${servicePackage}.client.${resourceName}Client;
 
     @Bean
     public ${resourceName}Client ${resourceNameLowerCamel}Client() {
-        return new ${resourceName}Client(hostUri)
-                .header(testTokenSupport.createTestTokenHeader());
+        return testClientSupport().createClientWithTestToken(${resourceName}Client.builder());
     }
 """)
 

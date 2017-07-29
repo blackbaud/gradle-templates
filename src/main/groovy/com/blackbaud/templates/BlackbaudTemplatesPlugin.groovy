@@ -23,7 +23,7 @@ import com.blackbaud.templates.tasks.AddPostgresContainerTask
 import com.blackbaud.templates.tasks.CreateBasicProjectTask
 import com.blackbaud.templates.tasks.CreateEmbeddedServiceTask
 import com.blackbaud.templates.tasks.CreateRestProjectTask
-import com.blackbaud.templates.tasks.CreateRestResourceTask
+import com.blackbaud.templates.tasks.CreateCrudResourceTask
 
 /**
  * The core of the templates plugin.
@@ -42,7 +42,7 @@ class BlackbaudTemplatesPlugin implements Plugin<Project> {
             project.task 'createRestProject', type: CreateRestProjectTask
         }
 
-        project.task 'createRestResource', type: CreateRestResourceTask
+        project.task 'createCrudResource', type: CreateCrudResourceTask
         project.task 'createRestEmbeddedService', type: CreateEmbeddedServiceTask
         project.task 'addPostgresContainer', type: AddPostgresContainerTask
         project.task 'addKafkaContainer', type: AddKafkaContainerTask

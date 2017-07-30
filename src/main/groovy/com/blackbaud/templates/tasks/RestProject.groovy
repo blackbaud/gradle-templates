@@ -21,6 +21,14 @@ class RestProject {
         this.serviceId = "${UPPER_CAMEL.to(LOWER_HYPHEN, serviceName)}"
     }
 
+    String getServiceId() {
+        serviceId
+    }
+
+    String getServiceName() {
+        serviceName
+    }
+
     String getServicePackage() {
         basicProject.servicePackage
     }
@@ -39,39 +47,15 @@ class RestProject {
     }
 
     void initPostgres() {
-        applyEntityScan()
-
-        DatasourceProject datasourceProject = new DatasourceProject(basicProject)
+        DatasourceProject datasourceProject = new DatasourceProject(this)
         datasourceProject.initPostgres()
-        FileUtils.appendAfterLine(basicProject.getProjectFile("build.gradle"), /compile.*common-spring-boot/,
-                """\
-    compile "com.blackbaud:common-spring-boot-persistence:\${springBootVersion}-2.+"
-    compile "postgresql:postgresql:9.0-801.jdbc4"
-    compile "org.liquibase:liquibase-core\""""
-        )
-
-        basicProject.applyTemplate("src/deploy/cloudfoundry") {
-            "app-descriptor.yml" template: "/templates/deploy/app-descriptor-postgres.yml.tmpl"
-        }
-
-        File componentTestFile = basicProject.findFile("ComponentTest.java")
-        FileUtils.appendAfterLine(componentTestFile, /import.*WebAppConfiguration/,
-                "import org.springframework.test.context.jdbc.Sql;"
-        )
-        FileUtils.appendAfterLine(componentTestFile, /.*@WebAppConfiguration/,
-                "@Sql(scripts = \"classpath:/db/test_cleanup.sql\", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)"
-        )
 
         basicProject.commitProjectFiles("initialize postgres container")
     }
 
     void initMybatis() {
-        basicProject.applyPlugin("mybatis")
-
-        basicProject.applyTemplate("src/main/resources") {
-            "mybatis-generator-config.xml" template: "/templates/mybatis/mybatis-generator-config.xml.tmpl",
-                    serviceId: serviceId, serviceName: serviceName.toLowerCase()
-        }
+        DatasourceProject datasourceProject = new DatasourceProject(this)
+        datasourceProject.initMybatis()
 
         basicProject.commitProjectFiles("initialize mybatis")
     }
@@ -145,25 +129,12 @@ class RestProject {
                     "groovy" {}
                 }
                 'componentTest' {
-                    'resources' {
-                        'db' {
-                            "test_cleanup.sql" content: ""
-                        }
-                    }
+                    'groovy' {}
                 }
             }
         }
 
         basicProject.commitProjectFiles("springboot rest bootstrap")
-    }
-
-    private void applyEntityScan() {
-        String entityScan = "@EntityScan({\"${servicePackage}\", \"com.blackbaud.boot.converters\"})"
-        String entityScanImport = "import org.springframework.boot.autoconfigure.domain.EntityScan;"
-        File applicationClassFile = basicProject.findFile("${serviceName}.java")
-
-        FileUtils.appendAfterLine(applicationClassFile, "@SpringBootApplication", entityScan)
-        FileUtils.appendAfterLine(applicationClassFile, "ManagementWebSecurityAutoConfiguration;", entityScanImport)
     }
 
     private void addResourcePaths() {
@@ -264,7 +235,7 @@ import ${servicePackage}.client.${resourceName}Client;
     }
 """)
 
-            DatasourceProject datasourceProject = new DatasourceProject(basicProject)
+            DatasourceProject datasourceProject = new DatasourceProject(this)
             datasourceProject.addCreateTableScript(resourcePath)
         }
     }

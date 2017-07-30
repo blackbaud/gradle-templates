@@ -196,33 +196,40 @@ import ${servicePackage}.client.${resourceName}Client;
     }
 """)
 
-        addApiObject(resourceName)
-
         FileUtils.appendAfterLine(basicProject.findFile("JerseyConfig.java"), /packages\s*\(/, "        packages(\"${servicePackage}.resources\");")
 
+        addApiObject(resourceName)
+
         if (addEntity) {
-            basicProject.applyTemplate("src/main/java/${servicePackagePath}/core/domain") {
-                "${resourceName}Entity.java" template: "/templates/springboot/rest/resource-entity.java.tmpl",
-                        resourceName: resourceName, packageName: "${servicePackage}.core.domain", tableName: resourcePath
-            }
+            addEntityObject(resourceName)
+        }
+    }
 
-            basicProject.applyTemplate("src/mainTest/groovy/${servicePackagePath}/core/domain") {
-                "Random${resourceName}EntityBuilder.groovy" template: "/templates/test/random-core-builder.groovy.tmpl",
-                        targetClass: "${resourceName}Entity", servicePackageName: servicePackage
-            }
+    void addEntityObject(String resourceName) {
+        String resourcePath = "${UPPER_CAMEL.to(LOWER_UNDERSCORE, resourceName)}"
+        String resourceNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, resourceName)
 
-            File randomCoreBuilderSupport = basicProject.findFile("RandomCoreBuilderSupport.java")
-            FileUtils.appendAfterLine(randomCoreBuilderSupport, "package", "import ${servicePackage}.core.domain.Random${resourceName}EntityBuilder;")
-            FileUtils.appendToClass(randomCoreBuilderSupport, """
+        basicProject.applyTemplate("src/main/java/${servicePackagePath}/core/domain") {
+            "${resourceName}Entity.java" template: "/templates/springboot/rest/resource-entity.java.tmpl",
+                                         resourceName: resourceName, packageName: "${servicePackage}.core.domain", tableName: resourcePath
+        }
+
+        basicProject.applyTemplate("src/mainTest/groovy/${servicePackagePath}/core/domain") {
+            "Random${resourceName}EntityBuilder.groovy" template: "/templates/test/random-core-builder.groovy.tmpl",
+                                                        targetClass: "${resourceName}Entity", servicePackageName: servicePackage
+        }
+
+        File randomCoreBuilderSupport = basicProject.findFile("RandomCoreBuilderSupport.java")
+        FileUtils.appendAfterLine(randomCoreBuilderSupport, "package", "import ${servicePackage}.core.domain.Random${resourceName}EntityBuilder;")
+        FileUtils.appendToClass(randomCoreBuilderSupport, """
 
     public Random${resourceName}EntityBuilder ${resourceNameLowerCamel}Entity() {
         return new Random${resourceName}EntityBuilder();
     }
 """)
 
-            DatasourceProject datasourceProject = new DatasourceProject(this)
-            datasourceProject.addCreateTableScript(resourcePath)
-        }
+        DatasourceProject datasourceProject = new DatasourceProject(this)
+        datasourceProject.addCreateTableScript(resourcePath)
     }
 
     void addApiObject(String resourceName, boolean upperCamel = false) {

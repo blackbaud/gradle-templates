@@ -196,22 +196,7 @@ import ${servicePackage}.client.${resourceName}Client;
     }
 """)
 
-        basicProject.applyTemplate("src/main/java/${servicePackagePath}/api") {
-            "${resourceName}.java" template: "/templates/springboot/rest/resource-api.java.tmpl",
-                    resourceName: resourceName, packageName: "${servicePackage}.api"
-        }
-        basicProject.applyTemplate("src/mainTest/groovy/${servicePackagePath}/api") {
-            "Random${resourceName}Builder.groovy" template: "/templates/test/random-client-builder.groovy.tmpl",
-                    targetClass: resourceName, servicePackageName: servicePackage
-        }
-        File randomClientBuilderSupport = basicProject.findFile("RandomClientBuilderSupport.java")
-        FileUtils.appendAfterLine(randomClientBuilderSupport, "package", "import ${servicePackage}.api.Random${resourceName}Builder;")
-        FileUtils.appendToClass(randomClientBuilderSupport, """
-
-    public Random${resourceName}Builder ${resourceNameLowerCamel}() {
-        return new Random${resourceName}Builder();
-    }
-""")
+        addApiObject(resourceName)
 
         FileUtils.appendAfterLine(basicProject.findFile("JerseyConfig.java"), /packages\s*\(/, "        packages(\"${servicePackage}.resources\");")
 
@@ -238,6 +223,28 @@ import ${servicePackage}.client.${resourceName}Client;
             DatasourceProject datasourceProject = new DatasourceProject(this)
             datasourceProject.addCreateTableScript(resourcePath)
         }
+    }
+
+    void addApiObject(String resourceName, boolean upperCamel = false) {
+        String resourceNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, resourceName)
+
+        basicProject.applyTemplate("src/main/java/${servicePackagePath}/api") {
+            "${resourceName}.java" template: "/templates/springboot/rest/resource-api.java.tmpl",
+                                   resourceName: resourceName, packageName: "${servicePackage}.api",
+                                   upperCamel: upperCamel
+        }
+        basicProject.applyTemplate("src/mainTest/groovy/${servicePackagePath}/api") {
+            "Random${resourceName}Builder.groovy" template: "/templates/test/random-client-builder.groovy.tmpl",
+                                                  targetClass: resourceName, servicePackageName: servicePackage
+        }
+        File randomClientBuilderSupport = basicProject.findFile("RandomClientBuilderSupport.java")
+        FileUtils.appendAfterLine(randomClientBuilderSupport, "package", "import ${servicePackage}.api.Random${resourceName}Builder;")
+        FileUtils.appendToClass(randomClientBuilderSupport, """
+
+    public Random${resourceName}Builder ${resourceNameLowerCamel}() {
+        return new Random${resourceName}Builder();
+    }
+""")
     }
 
     void createBasicResource(String resourceName, boolean addWireSpec) {

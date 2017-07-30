@@ -11,8 +11,7 @@ class AddPostgresContainerTask extends AbstractTemplateTask {
 
     @TaskAction
     void addPostgresContainer() {
-        BasicProject basicProject = openBasicProject()
-        RestProject restProject = new RestProject(basicProject)
+        RestProject restProject = openRestProject()
         DatasourceProject datasourceProject = new DatasourceProject(restProject)
         datasourceProject.initPostgres()
         if (projectProps.isPropertyDefined("mybatis")) {

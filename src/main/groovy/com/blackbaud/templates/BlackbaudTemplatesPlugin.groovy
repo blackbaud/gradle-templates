@@ -16,6 +16,7 @@
  */
 package com.blackbaud.templates
 
+import com.blackbaud.templates.tasks.AddApiObjectTask
 import com.blackbaud.templates.tasks.CreateBasicResourceTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -48,6 +49,7 @@ class BlackbaudTemplatesPlugin implements Plugin<Project> {
         project.task 'createRestEmbeddedService', type: CreateEmbeddedServiceTask
         project.task 'addPostgresContainer', type: AddPostgresContainerTask
         project.task 'addKafkaContainer', type: AddKafkaContainerTask
+        project.task 'addApiObject', type: AddApiObjectTask
     }
 
 }

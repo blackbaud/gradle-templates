@@ -146,7 +146,7 @@ class RestProject {
 
     void createEmbeddedService(boolean addEntity) {
         addResourcePaths()
-        createCrudResource(serviceName, addEntity)
+        createCrudResource(serviceName, addEntity, false)
 
         println "********************************************************"
         println "********************************************************"
@@ -158,27 +158,39 @@ class RestProject {
     }
 
     void createCrudResource(String resourceName, boolean addEntity, boolean addWireSpec) {
+        addResourceAndSupportingClasses(resourceName, "crud", addWireSpec)
+
+        addApiObject(resourceName)
+
+        if (addEntity) {
+            addEntityObject(resourceName)
+        }
+    }
+
+    private void addResourceAndSupportingClasses(String resourceName, String qualifier, boolean addWireSpec) {
         String resourcePath = "${UPPER_CAMEL.to(LOWER_UNDERSCORE, resourceName)}"
         String resourceVarName = "${resourcePath.toUpperCase()}_PATH"
         String resourceNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, resourceName)
 
+        applyResourcesPackageToJerseyConfig()
         addResourcePathConstant(resourcePath, resourceVarName)
+
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/resources") {
-            "${resourceName}Resource.java" template: "/templates/springboot/rest/resource-crud.java.tmpl",
-                    resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
+            "${resourceName}Resource.java" template: "/templates/springboot/rest/resource-${qualifier}.java.tmpl",
+                                           resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
         }
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/client") {
-            "${resourceName}Client.java" template: "/templates/springboot/rest/resource-crud-client.java.tmpl",
+            "${resourceName}Client.java" template: "/templates/springboot/rest/resource-${qualifier}-client.java.tmpl",
                                          resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
         }
         basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
             "${resourceName}ResourceSpec.groovy" template: "/templates/springboot/rest/resource-spec.groovy.tmpl",
-                    resourceName: resourceName, servicePackage: "${servicePackage}"
+                                                 resourceName: resourceName, servicePackage: "${servicePackage}"
         }
         if (addWireSpec) {
             basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
                 "${resourceName}ResourceWireSpec.groovy" template: "/templates/springboot/rest/resource-wirespec.groovy.tmpl",
-                        resourceName: resourceName, servicePackage: "${servicePackage}"
+                                                         resourceName: resourceName, servicePackage: "${servicePackage}"
             }
         }
         File testConfig = basicProject.findFile("TestConfig.java")
@@ -186,7 +198,6 @@ class RestProject {
                                   """import org.springframework.context.annotation.Bean;
 import ${servicePackage}.client.${resourceName}Client;
 """
-
         )
         FileUtils.appendToClass(testConfig, """
 
@@ -195,13 +206,23 @@ import ${servicePackage}.client.${resourceName}Client;
         return testClientSupport().createClientWithTestToken(${resourceName}Client.builder());
     }
 """)
+    }
 
-        FileUtils.appendAfterLine(basicProject.findFile("JerseyConfig.java"), /packages\s*\(/, "        packages(\"${servicePackage}.resources\");")
+    private void addResourcePathConstant(String resourcePath, String resourceVarName) {
+        File resourcePathsFile = basicProject.getProjectFile("src/main/java/${servicePackagePath}/api/ResourcePaths.java")
+        if (resourcePathsFile.exists() == false) {
+            addResourcePaths()
+        }
 
-        addApiObject(resourceName)
+        FileUtils.appendToClass(resourcePathsFile, """
+    public static final String ${resourceVarName} = "/${resourcePath}";
+""")
+    }
 
-        if (addEntity) {
-            addEntityObject(resourceName)
+    private void applyResourcesPackageToJerseyConfig() {
+        File jerseyConfig = basicProject.findFile("JerseyConfig.java")
+        if (jerseyConfig.text.contains(/packages("${servicePackage}.resources")/) == false) {
+            FileUtils.appendAfterLine(basicProject.findFile("JerseyConfig.java"), /packages\s*\(/, "        packages(\"${servicePackage}.resources\");")
         }
     }
 
@@ -255,56 +276,7 @@ import ${servicePackage}.client.${resourceName}Client;
     }
 
     void createBasicResource(String resourceName, boolean addWireSpec) {
-        String resourcePath = "${UPPER_CAMEL.to(LOWER_UNDERSCORE, resourceName)}"
-        String resourceVarName = "${resourcePath.toUpperCase()}_PATH"
-        String resourceNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, resourceName)
-
-        addResourcePathConstant(resourcePath, resourceVarName)
-        basicProject.applyTemplate("src/main/java/${servicePackagePath}/resources") {
-            "${resourceName}Resource.java" template: "/templates/springboot/rest/resource-basic.java.tmpl",
-                    resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
-        }
-        basicProject.applyTemplate("src/main/java/${servicePackagePath}/client") {
-            "${resourceName}Client.java" template: "/templates/springboot/rest/resource-basic-client.java.tmpl",
-                                         resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
-        }
-        basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
-            "${resourceName}ResourceSpec.groovy" template: "/templates/springboot/rest/resource-spec.groovy.tmpl",
-                    resourceName: resourceName, servicePackage: "${servicePackage}"
-        }
-        if (addWireSpec) {
-            basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
-                "${resourceName}ResourceWireSpec.groovy" template: "/templates/springboot/rest/resource-wirespec.groovy.tmpl",
-                        resourceName: resourceName, servicePackage: "${servicePackage}"
-            }
-        }
-        File testConfig = basicProject.findFile("TestConfig.java")
-        FileUtils.appendAfterLine(testConfig, /import.*/,
-                                  """import org.springframework.context.annotation.Bean;
-import ${servicePackage}.client.${resourceName}Client;
-"""
-
-        )
-        FileUtils.appendToClass(testConfig, """
-
-    @Bean
-    public ${resourceName}Client ${resourceNameLowerCamel}Client() {
-        return testClientSupport().createClientWithTestToken(${resourceName}Client.builder());
-    }
-""")
-
-        FileUtils.appendAfterLine(basicProject.findFile("JerseyConfig.java"), /packages\s*\(/, "        packages(\"${servicePackage}.resources\");")
-    }
-
-    private void addResourcePathConstant(String resourcePath, String resourceVarName) {
-        File resourcePathsFile = basicProject.getProjectFile("src/main/java/${servicePackagePath}/api/ResourcePaths.java")
-        if (resourcePathsFile.exists() == false) {
-            addResourcePaths()
-        }
-
-        FileUtils.appendToClass(resourcePathsFile, """
-    public static final String ${resourceVarName} = "/${resourcePath}";
-""")
+        addResourceAndSupportingClasses(resourceName, "basic", addWireSpec)
     }
 
 }

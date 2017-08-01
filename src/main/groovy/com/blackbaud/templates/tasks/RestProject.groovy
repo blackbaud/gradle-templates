@@ -1,5 +1,7 @@
 package com.blackbaud.templates.tasks
 
+import org.eclipse.jgit.util.FileUtil
+
 import static com.google.common.base.CaseFormat.LOWER_CAMEL
 import static com.google.common.base.CaseFormat.LOWER_HYPHEN
 import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE
@@ -68,8 +70,6 @@ class RestProject {
     }
 
     private void createRestBase() {
-        addResourcePaths()
-
         basicProject.applyTemplate("src/main/java/${servicePackagePath}") {
             "${serviceName}.java" template: "/templates/springboot/application-class.java.tmpl",
                     serviceName: serviceName, servicePackage: servicePackage
@@ -81,11 +81,6 @@ class RestProject {
 
         basicProject.applyTemplate("src/main/resources") {
             "bootstrap-cloud.properties" template: "/templates/springboot/bootstrap-cloud.properties.tmpl"
-        }
-
-        basicProject.applyTemplate("src/main/java/${servicePackagePath}/config") {
-            "JerseyConfig.java" template: "/templates/springboot/rest/jersey-config.java.tmpl",
-                                servicePackage: "${servicePackage}"
         }
 
         basicProject.applyTemplate("src/deploy/cloudfoundry") {
@@ -100,12 +95,6 @@ class RestProject {
                     className: "TestConfig", packageName: servicePackage
         }
 
-        basicProject.applyTemplate("src/mainTest/groovy/${servicePackagePath}/api") {
-            "ClientARandom.java" template: "/templates/test/client-arandom.java.tmpl",
-                    packageName: "${servicePackage}.api"
-            "RandomClientBuilderSupport.java" template: "/templates/test/random-builder-support.java.tmpl",
-                    packageName: "${servicePackage}.api", qualifier: "Client"
-        }
         basicProject.applyTemplate("src/mainTest/groovy/${servicePackagePath}/core") {
             "CoreARandom.java" template: "/templates/test/core-arandom.java.tmpl",
                     servicePackageName: servicePackage
@@ -137,15 +126,7 @@ class RestProject {
         basicProject.commitProjectFiles("springboot rest bootstrap")
     }
 
-    private void addResourcePaths() {
-        basicProject.applyTemplate("src/main/java/${servicePackagePath}/api") {
-            'ResourcePaths.java' template: "/templates/springboot/rest/resource-paths.java.tmpl",
-                    packageName: "${servicePackage}.api"
-        }
-    }
-
     void createEmbeddedService(boolean addEntity) {
-        addResourcePaths()
         createCrudResource(serviceName, addEntity, false)
 
         println "********************************************************"
@@ -211,7 +192,10 @@ import ${servicePackage}.client.${resourceName}Client;
     private void addResourcePathConstant(String resourcePath, String resourceVarName) {
         File resourcePathsFile = basicProject.getProjectFile("src/main/java/${servicePackagePath}/api/ResourcePaths.java")
         if (resourcePathsFile.exists() == false) {
-            addResourcePaths()
+            basicProject.applyTemplate("src/main/java/${servicePackagePath}/api") {
+                'ResourcePaths.java' template: "/templates/springboot/rest/resource-paths.java.tmpl",
+                        packageName: "${servicePackage}.api"
+            }
         }
 
         FileUtils.appendToClass(resourcePathsFile, """
@@ -220,7 +204,14 @@ import ${servicePackage}.client.${resourceName}Client;
     }
 
     private void applyResourcesPackageToJerseyConfig() {
-        File jerseyConfig = basicProject.findFile("JerseyConfig.java")
+        File jerseyConfig = basicProject.getProjectFile("src/main/java/${servicePackagePath}/config/JerseyConfig.java")
+        if (jerseyConfig.exists() == false) {
+            basicProject.applyTemplate("src/main/java/${servicePackagePath}/config") {
+                "JerseyConfig.java" template: "/templates/springboot/rest/jersey-config.java.tmpl",
+                                    servicePackage: "${servicePackage}"
+            }
+        }
+
         if (jerseyConfig.text.contains(/packages("${servicePackage}.resources")/) == false) {
             FileUtils.appendAfterLine(basicProject.findFile("JerseyConfig.java"), /packages\s*\(/, "        packages(\"${servicePackage}.resources\");")
         }
@@ -265,7 +256,23 @@ import ${servicePackage}.client.${resourceName}Client;
             "Random${resourceName}Builder.groovy" template: "/templates/test/random-client-builder.groovy.tmpl",
                                                   targetClass: resourceName, servicePackageName: servicePackage
         }
-        File randomClientBuilderSupport = basicProject.findFile("RandomClientBuilderSupport.java")
+
+        File randomClientBuilderSupport = basicProject.getProjectFile("src/mainTest/groovy/${servicePackagePath}/api/RandomClientBuilderSupport.java")
+        if (randomClientBuilderSupport.exists() == false) {
+            basicProject.applyTemplate("src/mainTest/groovy/${servicePackagePath}/api") {
+                "ClientARandom.java" template: "/templates/test/client-arandom.java.tmpl",
+                        packageName: "${servicePackage}.api"
+                "RandomClientBuilderSupport.java" template: "/templates/test/random-builder-support.java.tmpl",
+                        packageName: "${servicePackage}.api", qualifier: "Client"
+            }
+
+            File coreARandom = basicProject.findFile("CoreARandom.java")
+            FileUtils.appendAfterLine(coreARandom, "import", "import ${servicePackage}.api.RandomClientBuilderSupport;")
+            FileUtils.appendAfterLine(coreARandom, /\s+private RandomCoreBuilderSupport.*/, """\
+    @Delegate
+    private RandomClientBuilderSupport randomClientBuilderSupport = new RandomClientBuilderSupport();"""
+            )
+        }
         FileUtils.appendAfterLine(randomClientBuilderSupport, "package", "import ${servicePackage}.api.Random${resourceName}Builder;")
         FileUtils.appendToClass(randomClientBuilderSupport, """
 

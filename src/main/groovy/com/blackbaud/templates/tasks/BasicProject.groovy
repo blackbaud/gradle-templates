@@ -95,6 +95,8 @@ class BasicProject {
     private void initBasicGradleBuild() {
         applyTemplate {
             'build.gradle' template: "/templates/basic/build.gradle.tmpl"
+            'gradle.properties' template: "/templates/basic/gradle.properties.tmpl",
+                    artifactId: repoName
         }
     }
 

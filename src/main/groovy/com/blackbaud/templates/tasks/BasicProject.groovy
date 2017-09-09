@@ -7,9 +7,6 @@ import com.blackbaud.templates.GitRepo
 import com.blackbaud.templates.ProjectProps
 import com.blackbaud.templates.ProjectTemplate
 
-import static com.google.common.base.CaseFormat.LOWER_HYPHEN
-import static com.google.common.base.CaseFormat.UPPER_CAMEL
-
 class BasicProject {
 
     @Delegate
@@ -39,16 +36,8 @@ class BasicProject {
         gitRepo
     }
 
-    String getServiceName() {
-        LOWER_HYPHEN.to(UPPER_CAMEL, repoName)
-    }
-
-    String getServicePackage() {
-        "com.blackbaud.${serviceName.toLowerCase()}"
-    }
-
-    String getServicePackagePath() {
-        servicePackage.replaceAll ( "\\.", "/" )
+    ProjectProps getProjectProps() {
+        projectProps
     }
 
     File getRepoDir() {
@@ -71,8 +60,8 @@ class BasicProject {
             initBasicGradleBuild()
             gitRepo.commitProjectFiles("added build.gradle")
 
-            initBasicTest()
-            gitRepo.commitProjectFiles("add basic test")
+            new File(repoDir, "src/main/java").mkdirs()
+            new File(repoDir, "src/test/groovy").mkdirs()
         }
     }
 
@@ -137,13 +126,6 @@ class BasicProject {
     private void initGitignore() {
         applyTemplate {
             '.gitignore' template: "/templates/git/gitignore.tmpl"
-        }
-    }
-
-    private void initBasicTest() {
-        applyTemplate {
-            "src/test/groovy/${servicePackagePath}/${this.serviceName}Spec.groovy" template: "/templates/test/basic-spec.groovy.tmpl",
-                                                                                   serviceName: serviceName, servicePackage: servicePackage
         }
     }
 

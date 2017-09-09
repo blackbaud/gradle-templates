@@ -13,6 +13,10 @@ apply plugin: "blackbaud-internal-rest"
 apply plugin: "blackbaud-templates"
 apply plugin: "spring-boot"
 
+ext {
+    servicePackageName="${servicePackageName}"
+}
+
 configurations {
     client
 }

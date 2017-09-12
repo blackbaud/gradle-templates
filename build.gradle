@@ -37,7 +37,7 @@ def setGradleVersions() {
       File propFile = new File('gradle/wrapper/gradle-wrapper.properties')
       props.load(propFile.newDataInputStream())
       String distUrl = props.getProperty('distributionUrl')
-      group = (distUrl =~ "gradle-blackbaud-((.*)-bb.[0-9].[0-9])-bin.zip")
+      group = (distUrl =~ "gradle-blackbaud-((.*)-bb.[0-9]+.[0-9]+)-bin.zip")
     } catch (Exception ex) {
       throw new RuntimeException("Failed to parse gradle version from gradle-wrapper.properties. Please ensure distributionUrl is set!")
     }

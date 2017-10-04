@@ -229,7 +229,7 @@ import ${servicePackage}.client.${resourceName}Client;
     }
 
     void addApiObject(String resourceName, boolean upperCamel = false) {
-        basicProject.addApiObject("rest", resourceName, upperCamel)
+        basicProject.addApiObject("rest", resourceName, "${servicePackage}.api.rest", upperCamel)
     }
 
     void createBasicResource(String resourceName, boolean addWireSpec) {

@@ -7,6 +7,10 @@ import com.blackbaud.templates.GitRepo
 import com.blackbaud.templates.ProjectProps
 import com.blackbaud.templates.ProjectTemplate
 
+import static com.google.common.base.CaseFormat.LOWER_CAMEL
+import static com.google.common.base.CaseFormat.LOWER_HYPHEN
+import static com.google.common.base.CaseFormat.UPPER_CAMEL
+
 class BasicProject {
 
     @Delegate
@@ -47,6 +51,21 @@ class BasicProject {
     File getTargetDir() {
         targetDir
     }
+
+    String getServiceName() {
+        String defaultServiceName = LOWER_HYPHEN.to(UPPER_CAMEL, repoName).capitalize()
+        projectProps.getOptionalProjectPropertyOrDefault("serviceName", defaultServiceName)
+    }
+
+    String getServicePackage() {
+        String defaultPackageName = "com.blackbaud.${serviceName.toLowerCase()}"
+        projectProps.getOptionalProjectPropertyOrDefault("servicePackageName", defaultPackageName)
+    }
+
+    String getServicePackagePath() {
+        servicePackage.replaceAll ("\\.", "/" )
+    }
+
 
     void initGradleProject() {
         if (new File(repoDir, "build.gradle").exists() == false) {
@@ -176,6 +195,75 @@ class BasicProject {
     - ${service}""")
 
         }
+    }
+
+    void includeGradleSubmodule(String submoduleName) {
+        File gradleSettings = getProjectFile("settings.gradle")
+        if (gradleSettings.exists() == false) {
+            gradleSettings.text = ""
+        }
+
+        if (gradleSettings.text !=~ /${submoduleName}/) {
+            gradleSettings.text += "include \"${submoduleName}\"\n"
+        }
+    }
+
+    void addClientSubmodule(String type) {
+        File clientBuildFile = getProjectFile("${type}-client/build.gradle")
+        if (clientBuildFile.exists() == false) {
+            applyTemplate("${type}-client") {
+                "build.gradle" template: "/templates/springboot/${type}/build.${type}-client.gradle.tmpl"
+            }
+
+            includeGradleSubmodule("${type}-client")
+
+            File buildFile = getProjectFileOrFail("build.gradle")
+            FileUtils.appendAfterLine(buildFile, /^dependencies \{/, "    compile project(\"${type}-client\")")
+            FileUtils.appendBeforeLine(buildFile, /sharedTest/, "    sharedTestCompile project(path: \"${type}-client\", configuration: \"mainTestRuntime\")")
+        }
+    }
+
+    void addApiObject(String type, String resourceName, boolean upperCamel) {
+        addClientSubmodule(type)
+
+        String typeUpperCase = type.capitalize()
+
+        String resourceNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, resourceName)
+
+        applyTemplate("${type}-client/src/main/java/${servicePackagePath}/api") {
+            "${resourceName}.java" template: "/templates/springboot/${type}/resource-api.java.tmpl",
+                                   resourceName: resourceName, packageName: "${servicePackage}.api",
+                                   upperCamel: upperCamel
+        }
+        applyTemplate("${type}-client/src/mainTest/groovy/${servicePackagePath}/api") {
+            "Random${resourceName}Builder.groovy" template: "/templates/test/random-client-builder.groovy.tmpl",
+                                                  targetClass: resourceName, servicePackageName: servicePackage,
+                                                  qualifier: "${typeUpperCase}Client"
+        }
+
+        File randomClientBuilderSupport = getProjectFile("${type}-client/src/mainTest/groovy/${servicePackagePath}/api/${typeUpperCase}ClientRandomBuilderSupport.java")
+        if (randomClientBuilderSupport.exists() == false) {
+            applyTemplate("${type}-client/src/mainTest/groovy/${servicePackagePath}/api") {
+                "${typeUpperCase}ClientARandom.java" template: "/templates/test/client-arandom.java.tmpl",
+                        packageName: "${servicePackage}.api", qualifier: "${typeUpperCase}Client"
+                "${typeUpperCase}ClientRandomBuilderSupport.java" template: "/templates/test/random-builder-support.java.tmpl",
+                        packageName: "${servicePackage}.api", qualifier: "${typeUpperCase}Client"
+            }
+
+            File coreARandom = findFile("CoreARandom.java")
+            FileUtils.appendAfterLine(coreARandom, "import", "import ${servicePackage}.api.${typeUpperCase}ClientRandomBuilderSupport;")
+            FileUtils.appendAfterLine(coreARandom, /\s+private CoreRandomBuilderSupport.*/, """\
+    @Delegate
+    private ${typeUpperCase}ClientRandomBuilderSupport ${type}ClientRandomBuilderSupport = new ${typeUpperCase}ClientRandomBuilderSupport();"""
+            )
+        }
+        FileUtils.appendAfterLine(randomClientBuilderSupport, "package", "import ${servicePackage}.api.Random${resourceName}Builder;")
+        FileUtils.appendToClass(randomClientBuilderSupport, """
+
+    public Random${resourceName}Builder ${resourceNameLowerCamel}() {
+        return new Random${resourceName}Builder();
+    }
+""")
     }
 
 }

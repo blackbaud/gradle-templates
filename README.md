@@ -41,7 +41,6 @@ Creates a skeleton SpringBoot project (includes build.gradle, application class,
 You WILL get an error when running `./gradlew bootRun`:
 * After creating your project, update application.properties `server.port` and `management.port` values following
 the convention described in the [Blackbaud Wiki](https://wiki.blackbaud.com/display/LUM/Microservice+Port+Mapping+Registry)
-* Also, once you add resources to your project, add `swagger.resource.package=<resource package>` to application.properties. This is used for swagger doc generation and currently only supports one resource package.
 
 Supported task options:
 * clean - if the target directory already exists, delete it
@@ -72,6 +71,7 @@ will be ignored.
 #### createRestResource
 
 Creates a resource in an existing SpringBoot REST project (includes the Resource, ResourceSpec, ResourceWireSpec, etc)
+* You may need to update the package in application property swagger.resource.package if your resource does not live in com.blackbaud.<servicePackageName>.resources
 
 #### addPostgresContainer
 

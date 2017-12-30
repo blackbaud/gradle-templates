@@ -245,7 +245,7 @@ class BasicProject {
         }
     }
 
-    void addApiObject(String type, String resourceName, String servicePackage, boolean upperCamel) {
+    void addApiObject(String type, String resourceName, boolean upperCamel) {
         addClientSubmodule(type)
 
         String apiPackage = "${servicePackage}.api"

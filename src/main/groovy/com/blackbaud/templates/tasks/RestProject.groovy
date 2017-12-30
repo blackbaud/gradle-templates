@@ -52,8 +52,8 @@ class RestProject {
 
     private void enableAuthFilter() {
         FileUtils.appendBeforeLine(basicProject.getBuildFile(), /compile "com.blackbaud:common-spring-boot-rest.*/,
-                '    compile "com.blackbaud:tokens-client:2.+"')
-
+                '    compile "com.blackbaud:tokens-client:3.+"')
+        // TODO: selectively do this if !vsts
         File applicationClassFile = basicProject.findFile("${serviceName}.java")
         FileUtils.addImport(applicationClassFile, "import com.blackbaud.security.CoreSecurityEcosystemParticipantRequirementsProvider;")
         FileUtils.appendAfterLine(applicationClassFile, /public class .*/, """
@@ -153,7 +153,23 @@ authorization.filter.enable=false
     }
 
     void createCrudResource(String resourceName, boolean addEntity, boolean addWireSpec) {
-        addResourceAndSupportingClasses(resourceName, "crud", addWireSpec)
+        addResourceAndSupportingClasses(resourceName, addWireSpec)
+
+        File resourceFile = basicProject.findFile("${resourceName}Resource.java")
+        FileUtils.appendAfterLine(resourceFile, "class", """\
+
+    @GetMapping("/{id}")
+    public ${resourceName} find(@PathVariable("id") UUID id) {
+        throw new IllegalStateException("implement");
+    }
+""")
+
+        File clientFile = basicProject.findFile("${resourceName}Client.java")
+        FileUtils.appendAfterLine(clientFile, "class", """\
+
+    @RequestLine("GET /{id}")
+    ${resourceName} find(@Param("id") UUID id);
+""")
 
         addApiObject(resourceName)
 
@@ -162,20 +178,19 @@ authorization.filter.enable=false
         }
     }
 
-    private void addResourceAndSupportingClasses(String resourceName, String qualifier, boolean addWireSpec) {
+    private void addResourceAndSupportingClasses(String resourceName, boolean addWireSpec) {
         String resourcePath = "${UPPER_CAMEL.to(LOWER_UNDERSCORE, resourceName)}"
         String resourceVarName = "${resourcePath.toUpperCase()}_PATH"
         String resourceNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, resourceName)
 
-        applyResourcesPackageToJerseyConfig()
         addResourcePathConstant(resourcePath, resourceVarName)
 
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/resources") {
-            "${resourceName}Resource.java" template: "/templates/springboot/rest/resource-${qualifier}.java.tmpl",
+            "${resourceName}Resource.java" template: "/templates/springboot/rest/resource.java.tmpl",
                                            resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
         }
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/client") {
-            "${resourceName}Client.java" template: "/templates/springboot/rest/resource-${qualifier}-client.java.tmpl",
+            "${resourceName}Client.java" template: "/templates/springboot/rest/resource-client.java.tmpl",
                                          resourceName: resourceName, servicePackage: "${servicePackage}", resourcePathVar: resourceVarName
         }
         basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}/resources") {
@@ -188,7 +203,10 @@ authorization.filter.enable=false
                                                          resourceName: resourceName, servicePackage: "${servicePackage}"
             }
         }
-        File testConfig = basicProject.findFile("TestConfig.java")
+        File testConfig = basicProject.findOptionalFile("ComponentTestConfig.java")
+        if (testConfig == null) {
+            testConfig = basicProject.findFile("TestConfig.java")
+        }
         FileUtils.appendAfterLine(testConfig, /import.*/,
                                   """import org.springframework.context.annotation.Bean;
 import ${servicePackage}.client.${resourceName}Client;
@@ -198,7 +216,7 @@ import ${servicePackage}.client.${resourceName}Client;
 
     @Bean
     public ${resourceName}Client ${resourceNameLowerCamel}Client() {
-        return testClientSupport().createClientWithTestToken(${resourceName}Client.builder());
+        return testClientSupport.createClientWithTestToken(${resourceName}Client.class);
     }
 """)
     }
@@ -215,20 +233,6 @@ import ${servicePackage}.client.${resourceName}Client;
         FileUtils.appendToClass(resourcePathsFile, """
     public static final String ${resourceVarName} = "/${resourcePath}";
 """)
-    }
-
-    private void applyResourcesPackageToJerseyConfig() {
-        File jerseyConfig = basicProject.getProjectFile("src/main/java/${servicePackagePath}/config/JerseyConfig.java")
-        if (jerseyConfig.exists() == false) {
-            basicProject.applyTemplate("src/main/java/${servicePackagePath}/config") {
-                "JerseyConfig.java" template: "/templates/springboot/rest/jersey-config.java.tmpl",
-                                    servicePackage: "${servicePackage}"
-            }
-        }
-
-        if (jerseyConfig.text.contains(/packages("${servicePackage}.resources")/) == false) {
-            FileUtils.appendAfterLine(basicProject.findFile("JerseyConfig.java"), /packages\s*\(/, "        packages(\"${servicePackage}.resources\");")
-        }
     }
 
     void addEntityObject(String resourceName) {
@@ -259,11 +263,11 @@ import ${servicePackage}.client.${resourceName}Client;
     }
 
     void addApiObject(String resourceName, boolean upperCamel = false) {
-        basicProject.addApiObject("rest", resourceName, servicePackage, upperCamel)
+        basicProject.addApiObject("rest", resourceName, upperCamel)
     }
 
     void createBasicResource(String resourceName, boolean addWireSpec) {
-        addResourceAndSupportingClasses(resourceName, "basic", addWireSpec)
+        addResourceAndSupportingClasses(resourceName, addWireSpec)
     }
 
 }

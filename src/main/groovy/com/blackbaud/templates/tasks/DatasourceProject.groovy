@@ -67,7 +67,7 @@ class DatasourceProject {
     }
 
     private void applyApplicationProperties() {
-        File componentTestPropertiesFile = basicProject.getProjectFile("src/componentTest/resources/application-componentTest.properties")
+        File componentTestPropertiesFile = basicProject.getProjectFile("src/sharedTest/resources/application-test.properties")
         componentTestPropertiesFile.append("""
 spring.datasource.url=jdbc:postgresql://docker.localhost:5432/\${spring.application.name}-test
 """)

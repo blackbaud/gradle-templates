@@ -120,7 +120,7 @@ authorization.filter.enable=false
             "app-descriptor.yml" template: "/templates/deploy/app-descriptor.yml.tmpl"
         }
 
-        basicProject.applyTemplate("src/componentTest/java/${servicePackagePath}") {
+        basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}") {
             "ComponentTest.java" template: "/templates/springboot/rest/component-test-annotation.java.tmpl",
                     serviceName: serviceName, packageName: servicePackage
 

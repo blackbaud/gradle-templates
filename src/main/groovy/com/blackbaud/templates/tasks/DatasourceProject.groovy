@@ -48,7 +48,7 @@ class DatasourceProject {
     private void applyTestCleanupSql() {
         basicProject.getProjectFile("src/sharedTest/resources/db/test_cleanup.sql") << ""
 
-        basicProject.applyTemplate("src/sharedTest/java/${servicePackagePath}") {
+        basicProject.applyTemplate("src/sharedTest/groovy/${servicePackagePath}") {
             "PersistenceTest.java" template: "/templates/springboot/rest/persistence-test-annotation.java.tmpl",
                                    packageName: servicePackage
         }

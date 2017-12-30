@@ -39,28 +39,36 @@ class RestProject {
         basicProject
     }
 
-    void initRestProject(boolean shouldDisableAuthFilter) {
+    void initRestProject(boolean shouldDisableAuthFilter, boolean vsts) {
         basicProject.initGradleProject()
-        createRestBase()
+        createRestBase(vsts)
 
         if (shouldDisableAuthFilter) {
             disableAuthFilter()
         } else {
-            enableAuthFilter()
+            enableAuthFilter(vsts)
         }
     }
 
-    private void enableAuthFilter() {
+    private void enableAuthFilter(boolean vsts) {
         FileUtils.appendBeforeLine(basicProject.getBuildFile(), /compile "com.blackbaud:common-spring-boot-rest.*/,
                 '    compile "com.blackbaud:tokens-client:3.+"')
-        // TODO: selectively do this if !vsts
-        File applicationClassFile = basicProject.findFile("${serviceName}.java")
-        FileUtils.addImport(applicationClassFile, "import com.blackbaud.security.CoreSecurityEcosystemParticipantRequirementsProvider;")
-        FileUtils.appendAfterLine(applicationClassFile, /public class .*/, """
+
+        if (vsts) {
+            File applicationProperties = basicProject.getProjectFileOrFail("src/main/resources/application.properties")
+            applicationProperties << """\
+
+long.token.enabled=false
+"""
+        } else {
+            File applicationClassFile = basicProject.findFile("${serviceName}.java")
+            FileUtils.addImport(applicationClassFile, "import com.blackbaud.security.CoreSecurityEcosystemParticipantRequirementsProvider;")
+            FileUtils.appendAfterLine(applicationClassFile, /public class .*/, """
     @Bean
     public CoreSecurityEcosystemParticipantRequirementsProvider coreSecurityEcosystemParticipantRequirementsProvider() {
         return new CoreSecurityEcosystemParticipantRequirementsProvider();
     }""")
+        }
 
         basicProject.commitProjectFiles("enable auth filter")
     }
@@ -94,7 +102,7 @@ authorization.filter.enable=false
         basicProject.commitProjectFiles("initialize kafka")
     }
 
-    private void createRestBase() {
+    private void createRestBase(boolean vsts) {
         basicProject.applyTemplate("src/main/java/${servicePackagePath}") {
             "${serviceName}.java" template: "/templates/springboot/application-class.java.tmpl",
                     serviceName: serviceName, servicePackage: servicePackage
@@ -137,7 +145,8 @@ authorization.filter.enable=false
                     'resources' {
                         'application.properties' template: "/templates/springboot/rest/application.properties.tmpl",
                                                  resourcePackageName: "${servicePackage}.resources"
-                        'logback.xml' template: "/templates/logback/logback.tmpl"
+                        'logback.xml' template: "/templates/logback/logback.tmpl",
+                                      includeFileName: vsts ? "common-vsts.xml" : "common.xml"
                     }
                 }
                 'test' {

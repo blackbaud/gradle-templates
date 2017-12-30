@@ -36,7 +36,6 @@ class DatasourceProject {
     }
 
     void initPostgres() {
-        basicProject.addDockerPlugin()
         basicProject.applyPlugin("postgres")
 
         applyEntityScan()

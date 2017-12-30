@@ -22,7 +22,6 @@ class KafkaProject {
     }
 
     void initKafka() {
-        basicProject.addDockerPlugin()
         basicProject.applyPlugin("kafka")
 
         FileUtils.appendAfterLine(basicProject.getBuildFile(), /ext \{/,

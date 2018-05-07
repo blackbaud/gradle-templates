@@ -197,6 +197,14 @@ class BasicProject {
         matchingFile
     }
 
+    File findComponentTestConfig() {
+        File configFile = findOptionalFile("ComponentTestConfig.java")
+        if (configFile == null) {
+            configFile = findFile("TestConfig.java")
+        }
+        configFile
+    }
+
     void appendServiceToAppDescriptor(String service) {
         File appDescriptor = getProjectFileOrFail("src/deploy/cloudfoundry/app-descriptor.yml")
         if (appDescriptor.text.contains("services:")) {

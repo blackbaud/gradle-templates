@@ -4,9 +4,9 @@ import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 
-class AddServiceBusTopicTask extends AbstractTemplateTask {
+class AddServiceBusTopicConfigTask extends AbstractTemplateTask {
 
-    AddServiceBusTopicTask() {
+    AddServiceBusTopicConfigTask() {
         super("Adds a Service Bus topic configuration, message, and random builder skeleton " +
                       "(options: -Ptopic=?, one of [-Pinternal -Pconsumer -Ppublisher], [-PsessionEnabled])")
     }

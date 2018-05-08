@@ -125,7 +125,7 @@ builder supporting classes if not already created.
 Required task options:
 * name - name of the message to create (excluding the trailing Message as this will be appended automatically)
 
-#### addServiceBusTopic
+#### addServiceBusTopicConfig
 
 Creates a Service Bus topic configuration, payload, and random builder skeleton.  Will also create the random
 builder supporting classes if not already created.

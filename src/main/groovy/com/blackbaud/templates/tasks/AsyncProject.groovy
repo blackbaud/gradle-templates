@@ -36,12 +36,14 @@ class AsyncProject {
                 '    sharedTestCompile "com.blackbaud:common-async-service-bus-test:${commonAsyncServiceBusVersion}"')
 
         File applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
-        applicationPropertiesFile.append("""
+        if ((applicationPropertiesFile.exists() && applicationPropertiesFile.text.contains("servicebus.stub")) == false) {
+            applicationPropertiesFile.append("""
 servicebus.stub=true
 """)
+        }
 
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/servicebus") {
-            "ServiceBusConfig.java" template: "/templates/springboot/servicebus/service-bus-config.java.tmpl",
+            "ServiceBusConfig.java" template: "/templates/springboot/service-bus/service-bus-config.java.tmpl",
                                     servicePackageName: "${servicePackage}.servicebus"
         }
     }
@@ -51,27 +53,28 @@ servicebus.stub=true
     }
 
     void addExternalTopic(String topicName, boolean consumer, boolean publisher, boolean sessionEnabled) {
-        addTopic(topicName, false, publisher, consumer, sessionEnabled)
+        addTopic(topicName, false, consumer, publisher, sessionEnabled)
     }
 
     private void addTopic(String topicName, boolean internal, boolean consumer, boolean publisher, boolean sessionEnabled) {
         initServiceBusIfNotAlreadyInitialized()
 
         ServiceBusNameResolver formatter = new ServiceBusNameResolver(topicName)
+        File componentTestConfigFile = basicProject.findComponentTestConfig()
 
         File applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
         if (applicationPropertiesFile.text.contains("servicebus.namespace") == false) {
             applicationPropertiesFile.append("""
-    servicebus.namespace=namespace
+servicebus.namespace=namespace
 """)
         }
-        applicationPropertiesFile.append("""
+        applicationPropertiesFile.append("""\
 servicebus.${formatter.topicNameSnakeCase}.entity_path=${formatter.topicNameSnakeCase}
 servicebus.${formatter.topicNameSnakeCase}.shared_access_key_name=keyName
 servicebus.${formatter.topicNameSnakeCase}.shared_access_key=key
 """)
         if (consumer) {
-            applicationPropertiesFile.append("""
+            applicationPropertiesFile.append("""\
 servicebus.${formatter.topicNameSnakeCase}.subscription=consumer
 """)
         }
@@ -95,7 +98,23 @@ servicebus.${formatter.topicNameSnakeCase}.subscription=consumer
     }
 """)
 
-        File publisherConfigFile = publisher ? serviceBusConfigFile : basicProject.findComponentTestConfig()
+        File publisherConfigFile
+
+        if (publisher) {
+            publisherConfigFile = serviceBusConfigFile
+            if (internal) {
+                basicProject.addInternalApiObject("service-bus", formatter.payloadClassName, false)
+            } else {
+                basicProject.addExternalApiObject("service-bus", formatter.payloadClassName, false)
+            }
+        } else {
+            publisherConfigFile = componentTestConfigFile
+        }
+
+        FileUtils.addImport(publisherConfigFile, "org.springframework.beans.factory.annotation.Qualifier")
+        FileUtils.addImport(publisherConfigFile, "com.blackbaud.azure.servicebus.publisher.JsonMessagePublisher")
+        FileUtils.addImport(publisherConfigFile, "com.blackbaud.azure.servicebus.adapter.ServiceBusProperties")
+        FileUtils.addImport(publisherConfigFile, "com.blackbaud.azure.servicebus.publisher.ServiceBusPublisherFactory")
         FileUtils.appendToClass(publisherConfigFile, """
     @Bean
     public JsonMessagePublisher ${formatter.topicNameCamelCase}Publisher(
@@ -106,21 +125,14 @@ servicebus.${formatter.topicNameSnakeCase}.subscription=consumer
 """)
 
         if (consumer) {
-            if (internal) {
-                basicProject.applyTemplate("src/main/java/${servicePackagePath}/servicebus") {
-                    "${formatter.payloadClassName}.java" template: "/templates/springboot/servicebus/payload.java.tmpl",
-                                                         servicePackageName: "${servicePackage}.servicebus",
-                                                         className: formatter.payloadClassName
-                }
-            }
-
             basicProject.applyTemplate("src/main/java/${servicePackagePath}/servicebus") {
-                "${formatter.messageHandlerClassName}.java" template: "/templates/springboot/servicebus/message-handler.java.tmpl",
+                "${formatter.messageHandlerClassName}.java" template: "/templates/springboot/service-bus/message-handler.java.tmpl",
                                                             servicePackageName: "${servicePackage}.servicebus",
                                                             className: formatter.messageHandlerClassName,
                                                             payloadClassName: formatter.payloadClassName
             }
 
+            addConsumerImports(serviceBusConfigFile)
             FileUtils.appendToClass(serviceBusConfigFile, """
     @Bean
     public ${formatter.messageHandlerClassName} ${formatter.topicNameCamelCase}MessageHandler() {
@@ -139,8 +151,9 @@ servicebus.${formatter.topicNameSnakeCase}.subscription=consumer
     }
 """)
         } else {
-            File configFile = basicProject.findComponentTestConfig()
-            FileUtils.appendToClass(configFile, """
+            addConsumerImports(componentTestConfigFile)
+            FileUtils.addImport(componentTestConfigFile, "com.blackbaud.azure.servicebus.consumer.handlers.ValidatingServiceBusMessageHandler")
+            FileUtils.appendToClass(componentTestConfigFile, """
     @Bean
     public ValidatingServiceBusMessageHandler<${formatter.payloadClassName}> ${formatter.messageHandlerClassName}() {
         return new ValidatingServiceBusMessageHandler<>("${formatter.topicNameCamelCase}Handler");
@@ -149,7 +162,7 @@ servicebus.${formatter.topicNameSnakeCase}.subscription=consumer
     @Bean
     public ServiceBusConsumer sessionConsumer(
             ServiceBusConsumerBuilder.Factory serviceBusConsumerFactory,
-            @Qualifier("${formatter.topicNameCamelCase}MessageHandler") ValidatingServiceBusMessageHandler<{$formatter.payloadClassName}> messageHandler,
+            @Qualifier("${formatter.topicNameCamelCase}MessageHandler") ValidatingServiceBusMessageHandler<${formatter.payloadClassName}> messageHandler,
             @Qualifier("${formatter.topicNameCamelCase}ServiceBusProperties") ServiceBusProperties serviceBusProperties) {
         return serviceBusConsumerFactory.create()
                 .serviceBus(serviceBusProperties)
@@ -158,6 +171,13 @@ servicebus.${formatter.topicNameSnakeCase}.subscription=consumer
     }
 """)
         }
+    }
+
+    private void addConsumerImports(File configFile) {
+        FileUtils.addImport(configFile, "org.springframework.beans.factory.annotation.Qualifier")
+        FileUtils.addImport(configFile, "com.blackbaud.azure.servicebus.adapter.ServiceBusProperties")
+        FileUtils.addImport(configFile, "com.blackbaud.azure.servicebus.consumer.ServiceBusConsumer")
+        FileUtils.addImport(configFile, "com.blackbaud.azure.servicebus.consumer.ServiceBusConsumerBuilder")
     }
 
     private static class ServiceBusNameResolver {

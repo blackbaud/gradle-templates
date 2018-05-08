@@ -12,7 +12,9 @@ class FileUtils {
     }
 
     static void addImport(File file, String importToAdd) {
-        appendBeforeLine(file, /import .*/, importToAdd)
+        if (file.text.contains("import ${importToAdd}") == false) {
+            appendBeforeLine(file, /import .*/, "import ${importToAdd};")
+        }
     }
     
     static void appendBeforeLine(File file, String match, String lineToAdd) {

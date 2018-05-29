@@ -6,7 +6,7 @@ import org.gradle.api.tasks.TaskAction
 class AddEventHubsTask extends AbstractTemplateTask {
 
     AddEventHubsTask() {
-        super("Add an eventhubs container and default configuration to an existing project (options: -Pname=?)")
+        super("Add an eventhubs and default configuration to an existing project (options: -Pname=?)")
     }
 
     @TaskAction

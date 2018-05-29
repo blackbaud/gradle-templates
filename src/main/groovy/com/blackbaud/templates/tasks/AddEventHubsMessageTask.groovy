@@ -5,7 +5,7 @@ import org.gradle.api.tasks.TaskAction
 class AddEventHubsMessageTask extends AbstractTemplateTask {
 
     AddEventHubsMessageTask() {
-        super("Adds a eventhubs message and random builder skeleton (options: -Pname=?, -Pinternal)")
+        super("Adds an eventhubs message and random builder skeleton (options: -Pname=?, -Pinternal)")
     }
 
     @TaskAction

@@ -3,10 +3,10 @@ package com.blackbaud.templates.tasks
 import org.gradle.api.tasks.TaskAction
 
 
-class AddEventHubsContainerTask extends AbstractTemplateTask {
+class AddEventHubsTask extends AbstractTemplateTask {
 
-    AddEventHubsContainerTask() {
-        super("Add a eventhubs container and default configuration to an existing project (options: -Pname=?)")
+    AddEventHubsTask() {
+        super("Add an eventhubs container and default configuration to an existing project (options: -Pname=?)")
     }
 
     @TaskAction

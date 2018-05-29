@@ -5,15 +5,20 @@ import org.gradle.api.tasks.TaskAction
 class AddEventHubsMessageTask extends AbstractTemplateTask {
 
     AddEventHubsMessageTask() {
-        super("Adds a eventhubs message and random builder skeleton (options: -Pname=?)")
+        super("Adds a eventhubs message and random builder skeleton (options: -Pname=?, -Pinternal)")
     }
 
     @TaskAction
     void addApiObject() {
         String name = projectProps.getRequiredProjectProperty("name")
+        boolean internal = projectProps.isPropertyDefined("internal")
         BasicProject basicProject = openBasicProject()
         EventHubsProject eventhubs = new EventHubsProject(basicProject)
-        eventhubs.addApiObject(name)
+        if(internal) {
+            eventhubs.addInternalApiObject(name)
+        } else {
+            eventhubs.addExternalApiObject(name)
+        }
     }
 
 }

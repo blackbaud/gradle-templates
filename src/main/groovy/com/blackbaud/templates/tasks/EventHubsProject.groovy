@@ -62,8 +62,12 @@ eventhubs.stub=true
 """)
     }
 
-    void addApiObject(String resourceName) {
+    void addExternalApiObject(String resourceName) {
         basicProject.addExternalApiObject("eventhubs", resourceName, false)
+    }
+
+    void addInternalApiObject(String resourceName) {
+        basicProject.addInternalApiObject("eventhubs", resourceName, false)
     }
 
 }

@@ -23,17 +23,45 @@ class AsyncProject {
         basicProject.servicePackagePath
     }
 
+    private void initEventHubsIfNotAlreadyInitialized() {
+        if (basicProject.getBuildFile().text =~ /common-async-event-hubs/) {
+            return
+        }
+
+        FileUtils.appendAfterLastLine(basicProject.getBuildFile(), /ext \{/,
+                '        commonAsyncVersion = "2.+"')
+        FileUtils.appendAfterLine(basicProject.getBuildFile(), /compile.*common-spring-boot/,
+                '    compile "com.blackbaud:common-async-event-hubs:${commonAsyncVersion}"')
+        FileUtils.appendAfterLine(basicProject.getBuildFile(), /sharedTestCompile/,
+                '    sharedTestCompile "com.blackbaud:common-async-event-hubs-test:${commonAsyncVersion}"')
+
+        File applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
+        if ((applicationPropertiesFile.exists() && applicationPropertiesFile.text.contains("eventhubs.stub")) == false) {
+            applicationPropertiesFile.append("""
+eventhubs.stub=true
+""")
+        }
+
+        basicProject.applyTemplate("src/main/java/${servicePackagePath}/eventhubs") {
+            "EventHubsConfig.java" template: "/templates/springboot/eventhubs/event-hubs-config.java.tmpl",
+                                   servicePackageName: "${servicePackage}.servicebus"
+        }
+    }
+
+
+
+
     private void initServiceBusIfNotAlreadyInitialized() {
         if (basicProject.getBuildFile().text =~ /common-async-service-bus/) {
             return
         }
 
         FileUtils.appendAfterLastLine(basicProject.getBuildFile(), /ext \{/,
-                '        commonAsyncServiceBusVersion = "2.+"')
+                '        commonAsyncVersion = "2.+"')
         FileUtils.appendAfterLine(basicProject.getBuildFile(), /compile.*common-spring-boot/,
-                '    compile "com.blackbaud:common-async-service-bus:${commonAsyncServiceBusVersion}"')
+                '    compile "com.blackbaud:common-async-service-bus:${commonAsyncVersion}"')
         FileUtils.appendAfterLine(basicProject.getBuildFile(), /sharedTestCompile/,
-                '    sharedTestCompile "com.blackbaud:common-async-service-bus-test:${commonAsyncServiceBusVersion}"')
+                '    sharedTestCompile "com.blackbaud:common-async-service-bus-test:${commonAsyncVersion}"')
 
         File applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
         if ((applicationPropertiesFile.exists() && applicationPropertiesFile.text.contains("servicebus.stub")) == false) {

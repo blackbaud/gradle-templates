@@ -17,7 +17,7 @@
 package com.blackbaud.templates
 
 import com.blackbaud.templates.tasks.AddEventHubsTask
-import com.blackbaud.templates.tasks.AddEventHubsMessageTask
+import com.blackbaud.templates.tasks.AddEventHubsEventTask
 import com.blackbaud.templates.tasks.AddKafkaMessageTask
 import com.blackbaud.templates.tasks.AddRestApiObjectTask
 import com.blackbaud.templates.tasks.AddJpaObjectTask
@@ -56,7 +56,7 @@ class BlackbaudTemplatesPlugin implements Plugin<Project> {
         project.task 'addKafkaContainer', type: AddKafkaContainerTask
         project.task 'addKafkaMessage', type: AddKafkaMessageTask
         project.task 'addEventHubsContainer', type: AddEventHubsTask
-        project.task 'addEventHubsMessage', type: AddEventHubsMessageTask
+        project.task 'addEventHubsEvent', type: AddEventHubsEventTask
         project.task 'addRestApiObject', type: AddRestApiObjectTask
         project.task 'addJpaObject', type: AddJpaObjectTask
         project.task 'addServiceBusTopicConfig', type: AddServiceBusTopicConfigTask

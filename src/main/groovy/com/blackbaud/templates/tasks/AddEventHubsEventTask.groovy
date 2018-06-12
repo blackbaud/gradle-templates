@@ -2,10 +2,10 @@ package com.blackbaud.templates.tasks
 
 import org.gradle.api.tasks.TaskAction
 
-class AddEventHubsMessageTask extends AbstractTemplateTask {
+class AddEventHubsEventTask extends AbstractTemplateTask {
 
-    AddEventHubsMessageTask() {
-        super("Adds an eventhubs message and random builder skeleton (options: -Pname=?, -Pinternal)")
+    AddEventHubsEventTask() {
+        super("Adds an eventhubs event and random builder skeleton (options: -Pname=?, -Pinternal)")
     }
 
     @TaskAction

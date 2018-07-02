@@ -1,0 +1,14 @@
+package ${servicePackageName};
+
+import com.blackbaud.azure.eventhubs.consumer.EventHubEvent;
+import com.blackbaud.azure.eventhubs.consumer.handlers.EventBatchHandler;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class ${className} implements EventBatchHandler<${payloadClassName}> {
+
+    @Override
+    public void process(Iterable<EventHubEvent<T>> eventList) {
+    }
+
+}

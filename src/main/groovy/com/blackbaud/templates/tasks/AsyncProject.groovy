@@ -48,6 +48,141 @@ eventhubs.stub=true
         }
     }
 
+    void addInternalEventHub(String eventHubName) {
+        addEventHub(eventHubName, true, true, true)
+    }
+
+    void addExternalEventHub(String eventHubName, boolean consumer, boolean publisher) {
+        addEventHub(eventHubName, false, consumer, publisher)
+    }
+
+    private void addEventHub(String eventHubName, boolean internal, boolean consumer, boolean publisher) {
+        initEventHubsIfNotAlreadyInitialized()
+
+        NameResolver formatter = new NameResolver(eventHubName)
+        File componentTestConfigFile = basicProject.findComponentTestConfig()
+
+        File applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
+        if (applicationPropertiesFile.text.contains("eventhubs.namespace") == false) {
+            applicationPropertiesFile.append("""
+eventhubs.namespace=namespace
+eventhubs.operationTimeout=60
+""")
+        }
+        applicationPropertiesFile.append("""\
+eventhubs.${formatter.nameSnakeCase}.name=${formatter.nameSnakeCase}
+eventhubs.${formatter.nameSnakeCase}.shared_access_key_name=keyName
+eventhubs.${formatter.nameSnakeCase}.shared_access_key=key
+""")
+        if (consumer) {
+            applicationPropertiesFile.append("""\
+eventhubs.${formatter.nameSnakeCase}.consumer.storageAccountContainer=container
+""")
+        }
+
+        File eventHubsConfigFile = basicProject.findFile("EventHubsConfig.java")
+        FileUtils.appendToClass(eventHubsConfigFile, """
+    @Bean
+    public EventHubsProperties ${formatter.nameCamelCase}EventHubsProperties(
+            @Value("\${eventhubs.namespace}") String namespace,
+            @Value("\${eventhubs.${formatter.nameSnakeCase}.name}") String eventHubName,
+            @Value("\${eventhubs.${formatter.nameSnakeCase}.shared_access_key_name}") String sasKeyName,
+            @Value("\${eventhubs.${formatter.nameSnakeCase}.shared_access_key}") String sasKey,
+            @Value("\${eventhubs.${formatter.nameSnakeCase}.storage_account_container}") String storageAccountContainer,
+            @Value("\${eventhubs.operationTimeout}") int operationTimeout) {
+        return EventHubsProperties.builder()
+                .hubName(eventHubName)
+                .namespace(eventHubNamespace)
+                .sasKey(sasKey)
+                .sasKeyName(sasKeyName)
+                .storageAccountContainer(storageAccountContainer)
+                .operationTimeout(operationTimeout)
+                .build();
+    }
+    
+""")
+
+        File publisherConfigFile
+
+        if (publisher) {
+            publisherConfigFile = eventHubsConfigFile
+            if (internal) {
+                basicProject.addInternalApiObject("event-hubs", formatter.payloadClassName, false)
+            } else {
+                basicProject.addExternalApiObject("event-hubs", formatter.payloadClassName, false)
+            }
+        } else {
+            publisherConfigFile = componentTestConfigFile
+        }
+
+        FileUtils.addImport(publisherConfigFile, "org.springframework.beans.factory.annotation.Qualifier")
+        FileUtils.addImport(publisherConfigFile, "com.blackbaud.azure.eventhubs.publisher.JsonMessagePublisher")
+        FileUtils.addImport(publisherConfigFile, "com.blackbaud.azure.eventhubs.config.EventHubsProperties")
+        FileUtils.addImport(publisherConfigFile, "com.blackbaud.azure.eventhubs.publisher.EventHubPublisherFactory")
+        FileUtils.appendToClass(publisherConfigFile, """
+    @Bean
+    public JsonMessagePublisher ${formatter.nameCamelCase}Publisher(
+            EventHubPublisherFactory eventHubsPublisherFactory,
+            @Qualifier("${formatter.nameCamelCase}EventHubsProperties") EventHubsProperties eventHubsProperties) {
+        return eventHubsPublisherFactory.createPartitionedJsonPublisher(eventHubsProperties);
+    }
+""")
+
+        if (consumer) {
+            basicProject.applyTemplate("src/main/java/${servicePackagePath}/eventhubs") {
+                "${formatter.messageHandlerClassName}.java" template: "/templates/springboot/eventhubs/event-batch-handler.java.tmpl",
+                                                            servicePackageName: "${servicePackage}.eventhubs",
+                                                            className: formatter.eventHandlerClassName,
+                                                            payloadClassName: formatter.payloadClassName
+            }
+
+            addServiceBusConsumerImports(eventHubsConfigFile)
+            FileUtils.appendToClass(eventHubsConfigFile, """
+    @Bean
+    public ${formatter.eventHandlerClassName} ${formatter.nameCamelCase}EventHandler() {
+        return new ${formatter.eventHandlerClassName}();
+    }
+
+    @Bean
+    public EventHubConsumer ${formatter.nameCamelCase}Consumer(
+            EventHubConsumerBuilder.Factory eventHubConsumerFactory,
+            ${formatter.eventHandlerClassName} ${formatter.nameCamelCase}EventHandler,
+            @Qualifier("${formatter.nameCamelCase}ServiceBusProperties") EventHubsProperties eventHubsProperties) {
+        return eventHubConsumerFactory.create()
+                .eventHub(eventHubsProperties)
+                .jsonEventBatchHandler(${formatter.nameCamelCase}EventHandler, ${formatter.payloadClassName}.class)
+                .build();
+    }
+""")
+        } else {
+            addEventHubsConsumerImports(componentTestConfigFile)
+            FileUtils.addImport(componentTestConfigFile, "com.blackbaud.azure.eventhubs.consumer.handlers.ValidatingEventBatchHandler")
+            FileUtils.appendToClass(componentTestConfigFile, """
+    @Bean
+    public ValidatingEventBatchHandler<${formatter.payloadClassName}> ${formatter.eventHandlerClassName}() {
+        return new ValidatingEventBatchHandler<>("${formatter.nameCamelCase}Handler");
+    }
+
+    @Bean
+    public EventHubConsumer ${formatter.nameCamelCase}Consumer(
+            EventHubConsumerBuilder.Factory eventHubConsumerFactory,
+            @Qualifier("${formatter.nameCamelCase}MessageHandler") ValidatingEventBatchHandler<${formatter.payloadClassName}> eventHandler,
+            @Qualifier("${formatter.nameCamelCase}EventHubsProperties") EventHubsProperties eventHubsProperties) {
+        return eventHubConsumerFactory.create()
+                .eventHub(eventHubsProperties)
+                .jsonEventBatchHandler(messageHandler, ${formatter.payloadClassName}.class)
+                .build();
+    }
+""")
+        }
+    }
+
+    private void addEventHubsConsumerImports(File configFile) {
+        FileUtils.addImport(configFile, "org.springframework.beans.factory.annotation.Qualifier")
+        FileUtils.addImport(configFile, "com.blackbaud.azure.eventhubs.adapter.EventHubsProperties")
+        FileUtils.addImport(configFile, "com.blackbaud.azure.eventhubs.consumer.EventHubConsumer")
+        FileUtils.addImport(configFile, "com.blackbaud.azure.eventhubs.consumer.EventHubConsumerBuilder")
+    }
 
 
 
@@ -87,7 +222,7 @@ servicebus.stub=true
     private void addTopic(String topicName, boolean internal, boolean consumer, boolean publisher, boolean sessionEnabled) {
         initServiceBusIfNotAlreadyInitialized()
 
-        ServiceBusNameResolver formatter = new ServiceBusNameResolver(topicName)
+        NameResolver formatter = new NameResolver(topicName)
         File componentTestConfigFile = basicProject.findComponentTestConfig()
 
         File applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
@@ -97,25 +232,25 @@ servicebus.namespace=namespace
 """)
         }
         applicationPropertiesFile.append("""\
-servicebus.${formatter.topicNameSnakeCase}.entity_path=${formatter.topicNameSnakeCase}
-servicebus.${formatter.topicNameSnakeCase}.shared_access_key_name=keyName
-servicebus.${formatter.topicNameSnakeCase}.shared_access_key=key
+servicebus.${formatter.nameSnakeCase}.entity_path=${formatter.nameSnakeCase}
+servicebus.${formatter.nameSnakeCase}.shared_access_key_name=keyName
+servicebus.${formatter.nameSnakeCase}.shared_access_key=key
 """)
         if (consumer) {
             applicationPropertiesFile.append("""\
-servicebus.${formatter.topicNameSnakeCase}.subscription=consumer
+servicebus.${formatter.nameSnakeCase}.subscription=consumer
 """)
         }
 
         File serviceBusConfigFile = basicProject.findFile("ServiceBusConfig.java")
         FileUtils.appendToClass(serviceBusConfigFile, """
     @Bean
-    public ServiceBusProperties ${formatter.topicNameCamelCase}ServiceBusProperties(
+    public ServiceBusProperties ${formatter.nameCamelCase}ServiceBusProperties(
             @Value("\${servicebus.namespace}") String namespace,
-            @Value("\${servicebus.${formatter.topicNameSnakeCase}.entity_path}") String entityPath,
-            @Value("\${servicebus.${formatter.topicNameSnakeCase}.subscription}") String subscription,
-            @Value("\${servicebus.${formatter.topicNameSnakeCase}.shared_access_key_name}") String sasKeyName,
-            @Value("\${servicebus.${formatter.topicNameSnakeCase}.shared_access_key}") String sasKey) {
+            @Value("\${servicebus.${formatter.nameSnakeCase}.entity_path}") String entityPath,
+            @Value("\${servicebus.${formatter.nameSnakeCase}.subscription}") String subscription,
+            @Value("\${servicebus.${formatter.nameSnakeCase}.shared_access_key_name}") String sasKeyName,
+            @Value("\${servicebus.${formatter.nameSnakeCase}.shared_access_key}") String sasKey) {
         return ServiceBusProperties.builder()
                 .namespace(namespace)
                 .entityPath(entityPath)
@@ -145,9 +280,9 @@ servicebus.${formatter.topicNameSnakeCase}.subscription=consumer
         FileUtils.addImport(publisherConfigFile, "com.blackbaud.azure.servicebus.publisher.ServiceBusPublisherFactory")
         FileUtils.appendToClass(publisherConfigFile, """
     @Bean
-    public JsonMessagePublisher ${formatter.topicNameCamelCase}Publisher(
+    public JsonMessagePublisher ${formatter.nameCamelCase}Publisher(
             ServiceBusPublisherFactory serviceBusPublisherFactory,
-            @Qualifier("${formatter.topicNameCamelCase}ServiceBusProperties") ServiceBusProperties serviceBusProperties) {
+            @Qualifier("${formatter.nameCamelCase}ServiceBusProperties") ServiceBusProperties serviceBusProperties) {
         return serviceBusPublisherFactory.createJsonPublisher(serviceBusProperties);
     }
 """)
@@ -160,38 +295,38 @@ servicebus.${formatter.topicNameSnakeCase}.subscription=consumer
                                                             payloadClassName: formatter.payloadClassName
             }
 
-            addConsumerImports(serviceBusConfigFile)
+            addServiceBusConsumerImports(serviceBusConfigFile)
             FileUtils.appendToClass(serviceBusConfigFile, """
     @Bean
-    public ${formatter.messageHandlerClassName} ${formatter.topicNameCamelCase}MessageHandler() {
+    public ${formatter.messageHandlerClassName} ${formatter.nameCamelCase}MessageHandler() {
         return new ${formatter.messageHandlerClassName}();
     }
 
     @Bean
-    public ServiceBusConsumer ${formatter.topicNameCamelCase}Consumer(
+    public ServiceBusConsumer ${formatter.nameCamelCase}Consumer(
             ServiceBusConsumerBuilder.Factory serviceBusConsumerFactory,
-            ${formatter.messageHandlerClassName} ${formatter.topicNameCamelCase}MessageHandler,
-            @Qualifier("${formatter.topicNameCamelCase}ServiceBusProperties") ServiceBusProperties serviceBusProperties) {
+            ${formatter.messageHandlerClassName} ${formatter.nameCamelCase}MessageHandler,
+            @Qualifier("${formatter.nameCamelCase}ServiceBusProperties") ServiceBusProperties serviceBusProperties) {
         return serviceBusConsumerFactory.create()
                 .serviceBus(serviceBusProperties)
-                .jsonMessageHandler(${formatter.topicNameCamelCase}MessageHandler, ${formatter.payloadClassName}.class, ${sessionEnabled})
+                .jsonMessageHandler(${formatter.nameCamelCase}MessageHandler, ${formatter.payloadClassName}.class, ${sessionEnabled})
                 .build();
     }
 """)
         } else {
-            addConsumerImports(componentTestConfigFile)
+            addServiceBusConsumerImports(componentTestConfigFile)
             FileUtils.addImport(componentTestConfigFile, "com.blackbaud.azure.servicebus.consumer.handlers.ValidatingServiceBusMessageHandler")
             FileUtils.appendToClass(componentTestConfigFile, """
     @Bean
     public ValidatingServiceBusMessageHandler<${formatter.payloadClassName}> ${formatter.messageHandlerClassName}() {
-        return new ValidatingServiceBusMessageHandler<>("${formatter.topicNameCamelCase}Handler");
+        return new ValidatingServiceBusMessageHandler<>("${formatter.nameCamelCase}Handler");
     }
 
     @Bean
     public ServiceBusConsumer sessionConsumer(
             ServiceBusConsumerBuilder.Factory serviceBusConsumerFactory,
-            @Qualifier("${formatter.topicNameCamelCase}MessageHandler") ValidatingServiceBusMessageHandler<${formatter.payloadClassName}> messageHandler,
-            @Qualifier("${formatter.topicNameCamelCase}ServiceBusProperties") ServiceBusProperties serviceBusProperties) {
+            @Qualifier("${formatter.nameCamelCase}MessageHandler") ValidatingServiceBusMessageHandler<${formatter.payloadClassName}> messageHandler,
+            @Qualifier("${formatter.nameCamelCase}ServiceBusProperties") ServiceBusProperties serviceBusProperties) {
         return serviceBusConsumerFactory.create()
                 .serviceBus(serviceBusProperties)
                 .jsonMessageHandler(messageHandler, ${formatter.payloadClassName}.class, ${sessionEnabled})
@@ -201,38 +336,42 @@ servicebus.${formatter.topicNameSnakeCase}.subscription=consumer
         }
     }
 
-    private void addConsumerImports(File configFile) {
+    private void addServiceBusConsumerImports(File configFile) {
         FileUtils.addImport(configFile, "org.springframework.beans.factory.annotation.Qualifier")
         FileUtils.addImport(configFile, "com.blackbaud.azure.servicebus.adapter.ServiceBusProperties")
         FileUtils.addImport(configFile, "com.blackbaud.azure.servicebus.consumer.ServiceBusConsumer")
         FileUtils.addImport(configFile, "com.blackbaud.azure.servicebus.consumer.ServiceBusConsumerBuilder")
     }
 
-    private static class ServiceBusNameResolver {
-        String topicNameCamelCase
-        String topicNameSnakeCase
+    private static class NameResolver {
+        String nameCamelCase
+        String nameSnakeCase
 
-        ServiceBusNameResolver(String topicName) {
+        NameResolver(String topicName) {
             if (topicName.contains("_")) {
-                topicNameSnakeCase = topicName
-                topicNameCamelCase = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, topicName)
+                nameSnakeCase = topicName
+                nameCamelCase = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, topicName)
             } else {
                 if (Character.isLowerCase(topicName.charAt(0))) {
-                    topicNameCamelCase = topicName
-                    topicNameSnakeCase = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, topicName)
+                    nameCamelCase = topicName
+                    nameSnakeCase = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, topicName)
                 } else {
-                    topicNameCamelCase = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_CAMEL, topicName)
-                    topicNameSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, topicName)
+                    nameCamelCase = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_CAMEL, topicName)
+                    nameSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, topicName)
                 }
             }
         }
 
+        String getEventHandlerClassName() {
+            "${nameCamelCase.capitalize()}EventHandler"
+        }
+
         String getMessageHandlerClassName() {
-            "${topicNameCamelCase.capitalize()}MessageHandler"
+            "${nameCamelCase.capitalize()}MessageHandler"
         }
 
         String getPayloadClassName() {
-            "${topicNameCamelCase.capitalize()}Payload"
+            "${nameCamelCase.capitalize()}Payload"
         }
 
     }

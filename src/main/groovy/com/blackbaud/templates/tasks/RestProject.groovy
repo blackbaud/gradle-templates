@@ -95,6 +95,13 @@ authorization.filter.enable=false
         basicProject.commitProjectFiles("initialize mybatis")
     }
 
+    void initCosmos() {
+        DatasourceProject datasourceProject = new DatasourceProject(this)
+        datasourceProject.initCosmos()
+
+        basicProject.commitProjectFiles("initialize cosmos container")
+    }
+
     void initKafka() {
         KafkaProject kafkaProject = new KafkaProject(basicProject)
         kafkaProject.initKafka()

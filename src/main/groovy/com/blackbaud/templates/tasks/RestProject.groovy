@@ -305,6 +305,8 @@ import ${servicePackage}.client.${resourceName}Client;
     }
 
     void addCosmosEntityObject(String entityName, boolean auditable) {
+        String entityNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, entityName)
+
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/core/domain") {
             String entityNameLowerUnderscore = UPPER_CAMEL.to(LOWER_UNDERSCORE, entityName)
             "${entityName}Entity.java" template: "/templates/springboot/rest/mongo/mongo-entity.java.tmpl",
@@ -322,14 +324,14 @@ import ${servicePackage}.client.${resourceName}Client;
         }
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/core/domain") {
             "${entityName}TransactionalRepositoryImpl.java" template: "/templates/springboot/rest/mongo/mongo-transactional-repository-impl.java.tmpl",
-                                             entityName: entityName, packageName: "${servicePackage}.core.domain"
+                                                            entityName: entityName, entityNameLowerCamel: entityNameLowerCamel,
+                                                            packageName: "${servicePackage}.core.domain"
         }
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/core/domain") {
             "${entityName}CustomRepository.java" template: "/templates/springboot/rest/mongo/mongo-custom-repository.java.tmpl",
-                                             entityName: entityName, packageName: "${servicePackage}.core.domain"
+                                                 entityName: entityName, packageName: "${servicePackage}.core.domain"
         }
 
-        String entityNameLowerCamel = UPPER_CAMEL.to(LOWER_CAMEL, entityName)
         File cosmosConfig = basicProject.findFile("CosmosConfig.java")
         FileUtils.appendToClass(cosmosConfig, """
     @Bean

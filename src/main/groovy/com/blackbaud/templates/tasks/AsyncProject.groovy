@@ -81,7 +81,7 @@ servicebus.${formatter.topicNameSnakeCase}.producer_connection_url=\${APPSETTING
 servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2Ftest&sig=test
 """)
             applicationPropertiesFile.append("""\
-servicebus.${formatter.topicNameSnakeCase}.producer_connection_url=\${APPSETTING_ServiceBus__${formatter.topicNameSnakeCase}__Listen}
+servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=\${APPSETTING_ServiceBus__${formatter.topicNameSnakeCase}__Listen}
 """)
         }
 

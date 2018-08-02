@@ -13,7 +13,7 @@ ext {
 }
 
 dependencies {
-    integrationTestCompile "com.google.guava:guava:23.0"
+    integrationTestCompile "com.google.guava:guava:23.6.1-jre"
     integrationTestCompile "com.blackbaud:common-spring-boot-rest-test:${springBootVersion}-3.+"
     integrationTestCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
     integrationTestCompile "com.blackbaud:common-geb:3.+" 
@@ -22,7 +22,7 @@ dependencies {
     integrationTestCompile ("org.spockframework:spock-spring:1.1-groovy-2.4") {
         exclude group: "org.codehaus.groovy"
     }
-    integrationTestCompileOnly "org.projectlombok:lombok:1.16.18"
+    integrationTestCompileOnly "org.projectlombok:lombok:1.18.2"
 }
 
 task configureForInt << {

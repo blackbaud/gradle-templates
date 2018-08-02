@@ -21,7 +21,7 @@ allprojects {
         servicePackageName="com.blackbaud.service"
 
         groovyVersion = "2.4.7"
-        lombokVersion = "1.16.18"
+        lombokVersion = "1.18.2"
         spockVersion = "1.1-groovy-2.4"
         commonSpringBootVersion = "${springBootVersion}-3.+"
     }

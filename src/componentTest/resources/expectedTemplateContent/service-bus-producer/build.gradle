@@ -17,12 +17,12 @@ allprojects {
     apply plugin: "blackbaud-internal"
 
     ext {
-        commonAsyncServiceBusVersion = "2.+"
+        commonAsyncServiceBusVersion = "3.+"
         // used by the various gradle-templates task to determine the base service package
         servicePackageName="com.blackbaud.service"
 
         groovyVersion = "2.4.7"
-        lombokVersion = "1.16.18"
+        lombokVersion = "1.18.2"
         spockVersion = "1.1-groovy-2.4"
         commonSpringBootVersion = "${springBootVersion}-3.+"
     }

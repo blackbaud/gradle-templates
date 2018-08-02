@@ -5,15 +5,15 @@ class CurrentVersions {
 
     static final String SPRING_BOOT_VERSION = "1.4.1.RELEASE"
     static final String GROOVY_VERSION = "2.4.7"
-    static final String LOMBOK_VERSION = "1.16.18"
+    static final String LOMBOK_VERSION = "1.18.2"
     static final String SPOCK_VERSION = "1.1-groovy-2.4"
-    static final String GUAVA_VERSION = "23.0"
+    static final String GUAVA_VERSION = "23.6.1-jre"
 
     static final String COMMON_SPRING_BOOT_MAJOR_VERSION = "3"
     static final String COMMON_COSMOS_MAJOR_VERSION = "1"
     static final String COMMON_TEST_MAJOR_VERSION = "4"
     static final String COMMON_GEB_MAJOR_VERSION = "3"
-    static final String COMMON_ASYNC_MAJOR_VERSION = "2"
+    static final String COMMON_ASYNC_MAJOR_VERSION = "3"
     static final String COMMON_KAFKA_API_MAJOR_VERSION = "2"
     static final String COMMON_KAFKA_MAJOR_VERSION = "4"
     static final String GRADLE_INTERNAL_MAJOR_VERSION = "4"

@@ -32,6 +32,7 @@ public class ComponentTestConfig extends BaseTestConfig {
             ServiceBusPublisherBuilder.Factory serviceBusPublisherFactory,
             ProducerServiceBusProperties serviceBusProperties) {
         return serviceBusPublisherFactory.create()
+                .supportsSessions(ProducerPayload::getId)
                 .buildJsonPublisher(serviceBusProperties);
     }
 

@@ -123,7 +123,8 @@ servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=\${APPSETTING
     public JsonMessagePublisher ${formatter.topicNameCamelCase}Publisher(
             ServiceBusPublisherBuilder.Factory serviceBusPublisherFactory,
             ${formatter.propertiesClassName} serviceBusProperties) {
-        return serviceBusPublisherFactory.create()
+        return serviceBusPublisherFactory.create()${if (sessionEnabled) {"""
+                .supportsSessions(${formatter.payloadClassName}::getId)"""} else { "" } }
                 .buildJsonPublisher(serviceBusProperties);
     }
 """)

@@ -1,4 +1,4 @@
-package ${packageName};
+package com.blackbaud.service.core.domain;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface ${entityName}TransactionalRepository extends ShardedMongoRepository<${entityName}Entity, ObjectId> {
+public interface CarTransactionalRepository extends ShardedMongoRepository<CarEntity, ObjectId> {
 }

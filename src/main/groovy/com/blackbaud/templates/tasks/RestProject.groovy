@@ -325,15 +325,6 @@ import ${servicePackage}.client.${resourceName}Client;
             "${entityName}TransactionalRepository.java" template: "/templates/springboot/rest/mongo/mongo-transactional-repository.java.tmpl",
                                              entityName: entityName, packageName: "${servicePackage}.core.domain"
         }
-        basicProject.applyTemplate("src/main/java/${servicePackagePath}/core/domain") {
-            "${entityName}TransactionalRepositoryImpl.java" template: "/templates/springboot/rest/mongo/mongo-transactional-repository-impl.java.tmpl",
-                                                            entityName: entityName, entityNameLowerCamel: entityNameLowerCamel,
-                                                            packageName: "${servicePackage}.core.domain"
-        }
-        basicProject.applyTemplate("src/main/java/${servicePackagePath}/core/domain") {
-            "${entityName}CustomRepository.java" template: "/templates/springboot/rest/mongo/mongo-custom-repository.java.tmpl",
-                                                 entityName: entityName, packageName: "${servicePackage}.core.domain"
-        }
 
         File cosmosConfig = basicProject.findFile("CosmosConfig.java")
         FileUtils.appendToClass(cosmosConfig, """

@@ -280,4 +280,28 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         greenwashOrAssertExpectedContent(kafkaProject.basicProject, "add-resource-kafka-message")
     }
 
+    def "should add cosmos entity"() {
+        given:
+        RestProject restProject = initRestProject()
+        restProject.initCosmos()
+
+        when:
+        restProject.addCosmosEntityObject("Car", false)
+
+        then:
+        greenwashOrAssertExpectedContent(restProject, "add-cosmos-entity-message")
+    }
+
+    def "should add cosmos auditable entity"() {
+        given:
+        RestProject restProject = initRestProject()
+        restProject.initCosmos()
+
+        when:
+        restProject.addCosmosEntityObject("Truck", true)
+
+        then:
+        greenwashOrAssertExpectedContent(restProject, "add-cosmos-auditable-entity-message")
+    }
+
 }

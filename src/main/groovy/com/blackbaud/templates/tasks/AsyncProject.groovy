@@ -69,18 +69,18 @@ servicebus.${formatter.topicNameSnakeCase}.session_enabled=${sessionEnabled}
 """)
 
         File applicationLocalPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
-        if (publisher) {
-            applicationLocalPropertiesFile.append("""\
+        applicationLocalPropertiesFile.append("""\
 servicebus.${formatter.topicNameSnakeCase}.producer_connection_url=Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2Ftest&sig=test
 """)
+        applicationLocalPropertiesFile.append("""\
+servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2Ftest%2Fsubscriptions%2Ftest&sig=test
+""")
+        if (publisher) {
             applicationPropertiesFile.append("""\
 servicebus.${formatter.topicNameSnakeCase}.producer_connection_url=\${APPSETTING_ServiceBus__${formatter.topicNameSnakeCase}__Send}
 """)
         }
         if (consumer) {
-            applicationLocalPropertiesFile.append("""\
-servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2Ftest&sig=test
-""")
             applicationPropertiesFile.append("""\
 servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=\${APPSETTING_ServiceBus__${formatter.topicNameSnakeCase}__Listen}
 """)

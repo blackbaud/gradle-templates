@@ -1,5 +1,6 @@
 package com.blackbaud.templates.tasks
 
+import com.blackbaud.templates.CurrentVersions
 import org.gradle.api.GradleException
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
@@ -126,7 +127,7 @@ class BasicProject {
 
     private void initBasicGradleBuild() {
         applyTemplate {
-            'build.gradle' template: "/templates/basic/build.gradle.tmpl"
+            'build.gradle' ([template: "/templates/basic/build.gradle.tmpl"] + CurrentVersions.VERSION_MAP)
             'gradle.properties' template: "/templates/basic/gradle.properties.tmpl",
                     artifactId: repoName
         }
@@ -249,7 +250,7 @@ class BasicProject {
         File clientBuildFile = getProjectFile("${type}-client/build.gradle")
         if (clientBuildFile.exists() == false) {
             applyTemplate("${type}-client") {
-                "build.gradle" template: "/templates/springboot/${type}/build.${type}-client.gradle.tmpl"
+                "build.gradle" ([template: "/templates/springboot/${type}/build.${type}-client.gradle.tmpl"] + CurrentVersions.VERSION_MAP)
             }
 
             includeGradleSubmodule("${type}-client")

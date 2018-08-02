@@ -1,5 +1,7 @@
 package com.blackbaud.templates.tasks
 
+import com.blackbaud.templates.CurrentVersions
+
 
 class EventHubsProject {
 
@@ -23,7 +25,7 @@ class EventHubsProject {
 
     void initEventHubs(String name) {
         FileUtils.appendAfterLine(basicProject.getBuildFile(), /commonSpringBootVersion\s*=\s*"\$\{springBootVersion}/,
-                                      '        commonEventHubsVersion = "2.+"')
+                                      "        commonEventHubsVersion = \"${CurrentVersions.COMMON_ASYNC_MAJOR_VERSION}.+\"")
         FileUtils.appendAfterLine(basicProject.getBuildFile(), /compile.*common-spring-boot/,
                 '    compile "com.blackbaud:common-async-event-hubs:${commonEventHubsVersion}"')
         FileUtils.appendAfterLine(basicProject.getBuildFile(), /sharedTestCompile/,
@@ -38,7 +40,7 @@ eventhubs.${name}.sasKeyName=testsaskeyname
 eventhubs.${name}.storageAccountContainer=testcontainer
 
 eventhubs.consumer.defaults.maxBatchSize=100
-eventhubs.consumer.defaults.consumerGroupName=$Default
+eventhubs.consumer.defaults.consumerGroupName=\$Default
 eventhubs.consumer.defaults.storageAccountName=eventhubcommits
 eventhubs.consumer.defaults.storageAccountKey=anotherFakeKey
 
@@ -54,7 +56,7 @@ eventhubs.${name}.sasKeyName=RootManageSharedAccessKey
 eventhubs.${name}.storageAccountContainer=testcontainer
 
 eventhubs.consumer.defaults.maxBatchSize=100
-eventhubs.consumer.defaults.consumerGroupName=$Default
+eventhubs.consumer.defaults.consumerGroupName=\$Default
 eventhubs.consumer.defaults.storageAccountName=eventhubcommits
 eventhubs.consumer.defaults.storageAccountKey=anotherFakeKey
 

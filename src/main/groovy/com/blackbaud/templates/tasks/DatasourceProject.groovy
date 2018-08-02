@@ -151,7 +151,7 @@ spring.datasource.validation-query=SELECT 1;
         commonSpringBootVersion = "${springBootVersion}-${commonSpringBootMajorVersion}.+"''')
         }
         FileUtils.appendAfterLine(buildFile, /commonSpringBootVersion\s*=/, """\
-        commonCosmosVersion = "\${springBootVersion}-\${commonSpringBootMajorVersion}-${CurrentVersions.COMMON_COSMOS_VERSION}.+\"""")
+        commonCosmosVersion = "\${springBootVersion}-\${commonSpringBootMajorVersion}-${CurrentVersions.COMMON_COSMOS_MAJOR_VERSION}.+\"""")
 
         // TODO: for some reason, if spring-data-commons and spring-data-mongodb are not included (they are transitive
         // deps of common-cosmos), the wrong version will be pulled in... this is possibly due to default versions

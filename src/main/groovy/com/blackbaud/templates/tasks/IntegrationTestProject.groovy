@@ -1,5 +1,7 @@
 package com.blackbaud.templates.tasks
 
+import com.blackbaud.templates.CurrentVersions
+
 
 class IntegrationTestProject {
 
@@ -33,8 +35,8 @@ class IntegrationTestProject {
         basicProject.initBlackbaudGradleWrapper()
 
         basicProject.applyTemplate {
-            'build.gradle' template: "/templates/springboot/integrationtest/build.gradle.tmpl",
-                           artifactId: repoName, includeGeb: includeGeb
+            'build.gradle' ([template: "/templates/springboot/integrationtest/build.gradle.tmpl",
+                           artifactId: repoName, includeGeb: includeGeb] + CurrentVersions.VERSION_MAP)
             'gradle.properties' template: "/templates/basic/gradle.properties.tmpl",
                                 artifactId: repoName
             'src' {

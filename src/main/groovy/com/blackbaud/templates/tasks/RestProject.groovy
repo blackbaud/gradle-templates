@@ -1,5 +1,6 @@
 package com.blackbaud.templates.tasks
 
+import com.blackbaud.templates.CurrentVersions
 import com.blackbaud.templates.ProjectProps
 
 import static com.google.common.base.CaseFormat.LOWER_CAMEL
@@ -52,7 +53,7 @@ class RestProject {
 
     private void enableAuthFilter(boolean vsts) {
         FileUtils.appendBeforeLine(basicProject.getBuildFile(), /compile "com.blackbaud:common-spring-boot-rest.*/,
-                '    compile "com.blackbaud:tokens-client:3.+"')
+                "    compile \"com.blackbaud:tokens-client:${CurrentVersions.TOKENS_CLIENT_MAJOR_VERSION}.+\"")
 
         if (vsts) {
             File applicationProperties = basicProject.getProjectFileOrFail("src/main/resources/application.properties")
@@ -147,10 +148,12 @@ authorization.filter.enable=false
         }
 
         basicProject.applyTemplate {
-            'build.gradle' template: "/templates/springboot/rest/build.gradle.tmpl",
-                    servicePackageName: servicePackage
+            'build.gradle'([template          : "/templates/springboot/rest/build.gradle.tmpl",
+                            servicePackageName: servicePackage
+                           ] + CurrentVersions.VERSION_MAP)
+
             'gradle.properties' template: "/templates/basic/gradle.properties.tmpl",
-                    artifactId: serviceId
+                                artifactId: serviceId
             'src' {
                 'main' {
                     'resources' {

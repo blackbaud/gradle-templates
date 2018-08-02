@@ -1,5 +1,6 @@
 package com.blackbaud.templates.tasks
 
+import com.blackbaud.templates.CurrentVersions
 import com.google.common.base.CaseFormat
 
 
@@ -29,7 +30,7 @@ class AsyncProject {
         }
 
         FileUtils.appendAfterLastLine(basicProject.getBuildFile(), /ext \{/,
-                '        commonAsyncServiceBusVersion = "2.+"')
+                "        commonAsyncServiceBusVersion = \"${CurrentVersions.COMMON_ASYNC_MAJOR_VERSION}.+\"")
         FileUtils.appendAfterLine(basicProject.getBuildFile(), /compile.*common-spring-boot/,
                 '    compile "com.blackbaud:common-async-service-bus:${commonAsyncServiceBusVersion}"')
         FileUtils.appendAfterLine(basicProject.getBuildFile(), /sharedTestCompile/,

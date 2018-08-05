@@ -1,6 +1,7 @@
 package com.blackbaud.templates.tasks
 
 import com.blackbaud.templates.CurrentVersions
+import com.blackbaud.templates.ProjectFile
 import org.gradle.api.GradleException
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
@@ -181,40 +182,40 @@ class BasicProject {
         ProjectTemplate.fromRoot(new File(targetDir, relativePath), closure)
     }
 
-    File getProjectFile(String filePath) {
+    ProjectFile getProjectFile(String filePath) {
         File file = new File(targetDir, filePath)
         file.parentFile.mkdirs()
-        file
+        new ProjectFile(file)
     }
 
-    File getProjectFileOrFail(String filePath) {
-        File file = getProjectFile(filePath)
+    ProjectFile getProjectFileOrFail(String filePath) {
+        ProjectFile file = getProjectFile(filePath)
         if (file.exists() == false) {
             throw new GradleException("Failed to resolve ${file.name} at expected location=${file.absolutePath}")
         }
         file
     }
 
-    File findFile(String fileName) {
-        File matchingFile = findOptionalFile(fileName)
+    ProjectFile findFile(String fileName) {
+        ProjectFile matchingFile = findOptionalFile(fileName)
         if (matchingFile == null) {
             throw new RuntimeException("Failed to find file with name=${fileName} from baseDir=${targetDir.absolutePath}")
         }
         matchingFile
     }
 
-    File findOptionalFile(String fileName) {
+    ProjectFile findOptionalFile(String fileName) {
         File matchingFile = null
         targetDir.eachFileRecurse { File file ->
             if (file.name == fileName) {
                 matchingFile = file
             }
         }
-        matchingFile
+        matchingFile == null ? null : new ProjectFile(matchingFile)
     }
 
-    File findComponentTestConfig() {
-        File configFile = findOptionalFile("ComponentTestConfig.java")
+    ProjectFile findComponentTestConfig() {
+        ProjectFile configFile = findOptionalFile("ComponentTestConfig.java")
         if (configFile == null) {
             configFile = findFile("TestConfig.java")
         }
@@ -303,7 +304,7 @@ class BasicProject {
                                                   qualifier: "${typeUpperCamelCase}Client"
         }
 
-        File randomClientBuilderSupport = getProjectFile("${srcDir}/mainTest/groovy/${apiPackagePath}/${randomBuilderSupportClassName}.java")
+        ProjectFile randomClientBuilderSupport = getProjectFile("${srcDir}/mainTest/groovy/${apiPackagePath}/${randomBuilderSupportClassName}.java")
         if (randomClientBuilderSupport.exists() == false) {
             applyTemplate("${srcDir}/mainTest/groovy/${apiPackagePath}") {
                 "${typeUpperCamelCase}ClientARandom.java" template: "/templates/test/client-arandom.java.tmpl",
@@ -312,14 +313,14 @@ class BasicProject {
                         packageName: apiPackage, qualifier: "${typeUpperCamelCase}Client"
             }
 
-            File coreARandom = findFile("CoreARandom.java")
-            FileUtils.addImport(coreARandom, "${apiPackage}.${randomBuilderSupportClassName}")
+            ProjectFile coreARandom = findFile("CoreARandom.java")
+            coreARandom.addImport("${apiPackage}.${randomBuilderSupportClassName}")
             FileUtils.appendAfterLine(coreARandom, /\s+.*CoreRandomBuilderSupport coreRandomBuilderSupport.*/, """\
     @Delegate
     private ${randomBuilderSupportClassName} ${typeLowerCamelCase}ClientRandomBuilderSupport = new ${randomBuilderSupportClassName}();"""
             )
         }
-        FileUtils.appendToClass(randomClientBuilderSupport, """
+        randomClientBuilderSupport.appendToClass("""
 
     public Random${resourceName}Builder ${resourceNameLowerCamel}() {
         return new Random${resourceName}Builder();

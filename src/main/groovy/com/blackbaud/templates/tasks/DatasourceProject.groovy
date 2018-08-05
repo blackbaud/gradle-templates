@@ -1,6 +1,7 @@
 package com.blackbaud.templates.tasks
 
 import com.blackbaud.templates.CurrentVersions
+import com.blackbaud.templates.ProjectFile
 
 class DatasourceProject {
 
@@ -161,10 +162,10 @@ spring.datasource.validation-query=SELECT 1;
     compile "org.springframework.data:spring-data-commons:1.13.8.RELEASE"
     compile "org.springframework.data:spring-data-mongodb:1.10.11.RELEASE"''')
 
-        File applicationClass = basicProject.findFile("${basicProject.serviceName}.java")
-        FileUtils.addImport(applicationClass, "${servicePackage}.config.CosmosConfig")
-        FileUtils.addImport(applicationClass, "org.springframework.context.annotation.Import")
-        FileUtils.addConfigurationImport(applicationClass, "CosmosConfig.class")
+        ProjectFile applicationClass = basicProject.findFile("${basicProject.serviceName}.java")
+        applicationClass.addImport("${servicePackage}.config.CosmosConfig")
+        applicationClass.addImport("org.springframework.context.annotation.Import")
+        applicationClass.addConfigurationImport("CosmosConfig.class")
     }
 
     private void addCosmosConfig() {

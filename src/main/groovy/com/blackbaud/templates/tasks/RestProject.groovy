@@ -1,6 +1,7 @@
 package com.blackbaud.templates.tasks
 
 import com.blackbaud.templates.CurrentVersions
+import com.blackbaud.templates.ProjectFile
 import com.blackbaud.templates.ProjectProps
 
 import static com.google.common.base.CaseFormat.LOWER_CAMEL
@@ -62,8 +63,8 @@ bbauth.enabled=true
 long.token.enabled=false
 """
         } else {
-            File applicationClassFile = basicProject.findFile("${serviceName}.java")
-            FileUtils.addImport(applicationClassFile, "com.blackbaud.security.CoreSecurityEcosystemParticipantRequirementsProvider")
+            ProjectFile applicationClassFile = basicProject.findFile("${serviceName}.java")
+            applicationClassFile.addImport("com.blackbaud.security.CoreSecurityEcosystemParticipantRequirementsProvider")
             FileUtils.appendAfterLine(applicationClassFile, /public class .*/, """
     @Bean
     public CoreSecurityEcosystemParticipantRequirementsProvider coreSecurityEcosystemParticipantRequirementsProvider() {
@@ -228,17 +229,13 @@ authorization.filter.enable=false
                                                          resourceName: resourceName, servicePackage: "${servicePackage}"
             }
         }
-        File testConfig = basicProject.findOptionalFile("ComponentTestConfig.java")
+        ProjectFile testConfig = basicProject.findOptionalFile("ComponentTestConfig.java")
         if (testConfig == null) {
             testConfig = basicProject.findFile("TestConfig.java")
         }
-        FileUtils.appendAfterLine(testConfig, /import.*/,
-                                  """import org.springframework.context.annotation.Bean;
-import ${servicePackage}.client.${resourceName}Client;
-"""
-        )
-        FileUtils.appendToClass(testConfig, """
-
+        testConfig.addImport("import org.springframework.context.annotation.Bean")
+        testConfig.addImport("import ${servicePackage}.client.${resourceName}Client")
+        testConfig.appendToClass("""
     @Bean
     public ${resourceName}Client ${resourceNameLowerCamel}Client() {
         return testClientSupport.createClientWithTestToken(${resourceName}Client.class);
@@ -247,7 +244,7 @@ import ${servicePackage}.client.${resourceName}Client;
     }
 
     private void addResourcePathConstant(String resourcePath, String resourceVarName) {
-        File resourcePathsFile = basicProject.getProjectFile("rest-client/src/main/java/${servicePackagePath}/api/ResourcePaths.java")
+        ProjectFile resourcePathsFile = basicProject.getProjectFile("rest-client/src/main/java/${servicePackagePath}/api/ResourcePaths.java")
         if (resourcePathsFile.exists() == false) {
             basicProject.applyTemplate("rest-client/src/main/java/${servicePackagePath}/api") {
                 'ResourcePaths.java' template: "/templates/springboot/rest/resource-paths.java.tmpl",
@@ -255,7 +252,7 @@ import ${servicePackage}.client.${resourceName}Client;
             }
         }
 
-        FileUtils.appendToClass(resourcePathsFile, """
+        resourcePathsFile.appendToClass("""
     public static final String ${resourceVarName} = "/${resourcePath}";
 """)
     }
@@ -289,11 +286,11 @@ import ${servicePackage}.client.${resourceName}Client;
                                                       servicePackageName: servicePackage
         }
 
-        File randomCoreBuilderSupport = basicProject.findFile("CoreRandomBuilderSupport.java")
-        FileUtils.addImport(randomCoreBuilderSupport, "${servicePackage}.core.domain.${entityName}Repository")
-        FileUtils.addImport(randomCoreBuilderSupport, "${servicePackage}.core.domain.Random${entityName}EntityBuilder")
-        FileUtils.addImport(randomCoreBuilderSupport, "org.springframework.beans.factory.annotation.Autowired")
-        FileUtils.appendToClass(randomCoreBuilderSupport, """
+        ProjectFile randomCoreBuilderSupport = basicProject.findFile("CoreRandomBuilderSupport.java")
+        randomCoreBuilderSupport.addImport("${servicePackage}.core.domain.${entityName}Repository")
+        randomCoreBuilderSupport.addImport("${servicePackage}.core.domain.Random${entityName}EntityBuilder")
+        randomCoreBuilderSupport.addImport("org.springframework.beans.factory.annotation.Autowired")
+        randomCoreBuilderSupport.appendToClass("""
     @Autowired
     private ${entityName}Repository ${entityNameLowerCamel}Repository;
 
@@ -326,8 +323,8 @@ import ${servicePackage}.client.${resourceName}Client;
                                              entityName: entityName, packageName: "${servicePackage}.core.domain"
         }
 
-        File cosmosConfig = basicProject.findFile("CosmosConfig.java")
-        FileUtils.appendToClass(cosmosConfig, """
+        ProjectFile cosmosConfig = basicProject.findFile("CosmosConfig.java")
+        cosmosConfig.appendToClass("""
     @Bean
     public ${entityName}Repository ${entityNameLowerCamel}Repository(CosmosRetryableRepositoryFactory factory, ${entityName}TransactionalRepository transactionalRepository) {
         return factory.createRepository(transactionalRepository, ${entityName}Repository.class);

@@ -1,4 +1,4 @@
-package com.blackbaud.templates
+package com.blackbaud.templates.project
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project

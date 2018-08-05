@@ -1,4 +1,4 @@
-package com.blackbaud.templates
+package com.blackbaud.templates.project
 
 
 class ProjectFile extends File {

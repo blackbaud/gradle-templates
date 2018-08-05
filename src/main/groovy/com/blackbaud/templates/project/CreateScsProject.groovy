@@ -1,5 +1,7 @@
-package com.blackbaud.templates.tasks
+package com.blackbaud.templates.project
 
+import com.blackbaud.templates.project.BasicProject
+import com.blackbaud.templates.tasks.AbstractTemplateTask
 import org.gradle.api.tasks.TaskAction
 
 class CreateScsProject extends AbstractTemplateTask {

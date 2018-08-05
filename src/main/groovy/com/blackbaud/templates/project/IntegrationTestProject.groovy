@@ -1,6 +1,7 @@
-package com.blackbaud.templates.tasks
+package com.blackbaud.templates.project
 
 import com.blackbaud.templates.CurrentVersions
+import com.blackbaud.templates.project.BasicProject
 
 
 class IntegrationTestProject {

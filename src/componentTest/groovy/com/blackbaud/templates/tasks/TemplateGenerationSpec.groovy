@@ -1,10 +1,15 @@
 package com.blackbaud.templates.tasks
 
 import com.blackbaud.gradle.test.AbstractProjectSpecification
+import com.blackbaud.templates.project.AsyncProject
+import com.blackbaud.templates.project.BasicProject
+import com.blackbaud.templates.project.IntegrationTestProject
+import com.blackbaud.templates.project.KafkaProject
+import com.blackbaud.templates.project.RestProject
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import com.blackbaud.templates.GitRepo
-import com.blackbaud.templates.ProjectProps
+import com.blackbaud.templates.project.ProjectProps
 
 class TemplateGenerationSpec extends AbstractProjectSpecification {
 

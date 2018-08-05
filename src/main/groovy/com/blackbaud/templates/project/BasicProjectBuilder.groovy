@@ -1,6 +1,6 @@
-package com.blackbaud.templates
+package com.blackbaud.templates.project
 
-import com.blackbaud.templates.tasks.BasicProject
+import com.blackbaud.templates.GitRepo
 
 class BasicProjectBuilder {
 

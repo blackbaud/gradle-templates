@@ -1,8 +1,6 @@
-package com.blackbaud.templates.tasks
+package com.blackbaud.templates.project
 
-import com.blackbaud.templates.BuildFile
 import com.blackbaud.templates.CurrentVersions
-import com.blackbaud.templates.ProjectFile
 import com.google.common.base.CaseFormat
 
 

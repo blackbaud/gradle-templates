@@ -1,13 +1,10 @@
-package com.blackbaud.templates.tasks
+package com.blackbaud.templates.project
 
-import com.blackbaud.templates.BuildFile
 import com.blackbaud.templates.CurrentVersions
-import com.blackbaud.templates.ProjectFile
 import org.gradle.api.GradleException
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 import com.blackbaud.templates.GitRepo
-import com.blackbaud.templates.ProjectProps
 import com.blackbaud.templates.ProjectTemplate
 
 import static com.google.common.base.CaseFormat.LOWER_CAMEL

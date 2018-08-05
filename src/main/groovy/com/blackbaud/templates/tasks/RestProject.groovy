@@ -53,7 +53,7 @@ class RestProject {
     }
 
     private void enableAuthFilter(boolean vsts) {
-        FileUtils.appendBeforeLine(basicProject.getBuildFile(), /compile "com.blackbaud:common-spring-boot-rest.*/,
+        basicProject.buildFile.appendBeforeLine(/compile "com.blackbaud:common-spring-boot-rest.*/,
                 "    compile \"com.blackbaud:tokens-client:${CurrentVersions.TOKENS_CLIENT_MAJOR_VERSION}.+\"")
 
         if (vsts) {
@@ -65,7 +65,7 @@ long.token.enabled=false
         } else {
             ProjectFile applicationClassFile = basicProject.findFile("${serviceName}.java")
             applicationClassFile.addImport("com.blackbaud.security.CoreSecurityEcosystemParticipantRequirementsProvider")
-            FileUtils.appendAfterLine(applicationClassFile, /public class .*/, """
+            applicationClassFile.appendAfterLine(/public class .*/, """
     @Bean
     public CoreSecurityEcosystemParticipantRequirementsProvider coreSecurityEcosystemParticipantRequirementsProvider() {
         return new CoreSecurityEcosystemParticipantRequirementsProvider();
@@ -179,8 +179,8 @@ authorization.filter.enable=false
     void createResource(String resourceName, boolean addEntity, boolean addWireSpec) {
         addResourceAndSupportingClasses(resourceName, addWireSpec)
 
-        File resourceFile = basicProject.findFile("${resourceName}Resource.java")
-        FileUtils.appendAfterLine(resourceFile, "class", """\
+        ProjectFile resourceFile = basicProject.findFile("${resourceName}Resource.java")
+        resourceFile.appendAfterLine("class", """\
 
     @GetMapping("/{id}")
     public ${resourceName} find(@PathVariable("id") UUID id) {
@@ -188,8 +188,8 @@ authorization.filter.enable=false
     }
 """)
 
-        File clientFile = basicProject.findFile("${resourceName}Client.java")
-        FileUtils.appendAfterLine(clientFile, "class", """\
+        ProjectFile clientFile = basicProject.findFile("${resourceName}Client.java")
+        clientFile.appendAfterLine("class", """\
 
     @RequestLine("GET /{id}")
     ${resourceName} find(@Param("id") UUID id);

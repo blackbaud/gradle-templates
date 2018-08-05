@@ -1,5 +1,6 @@
 package com.blackbaud.templates.tasks
 
+import com.blackbaud.templates.BuildFile
 import com.blackbaud.templates.CurrentVersions
 import com.blackbaud.templates.ProjectFile
 import com.google.common.base.CaseFormat
@@ -26,23 +27,20 @@ class AsyncProject {
     }
 
     private void initServiceBusIfNotAlreadyInitialized() {
-        if (basicProject.getBuildFile().text =~ /common-async-service-bus/) {
+        BuildFile buildFile = basicProject.buildFile
+        if (buildFile.text =~ /common-async-service-bus/) {
             return
         }
 
-        FileUtils.appendAfterLastLine(basicProject.getBuildFile(), /ext \{/,
+        buildFile.appendAfterLastLine(/ext \{/,
                 "        commonAsyncServiceBusVersion = \"${CurrentVersions.COMMON_ASYNC_MAJOR_VERSION}.+\"")
-        FileUtils.appendAfterLine(basicProject.getBuildFile(), /compile.*common-spring-boot/,
+        buildFile.appendAfterLine(/compile.*common-spring-boot/,
                 '    compile "com.blackbaud:common-async-service-bus:${commonAsyncServiceBusVersion}"')
-        FileUtils.appendAfterLine(basicProject.getBuildFile(), /sharedTestCompile/,
+        buildFile.appendAfterLine(/sharedTestCompile/,
                 '    sharedTestCompile "com.blackbaud:common-async-service-bus-test:${commonAsyncServiceBusVersion}"')
 
-        File applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
-        if ((applicationPropertiesFile.exists() && applicationPropertiesFile.text.contains("servicebus.stub")) == false) {
-            applicationPropertiesFile.append("""
-servicebus.stub=true
-""")
-        }
+        ProjectFile applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
+        applicationPropertiesFile.addPropertyWithSeparator("servicebus.stub", "true")
 
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/servicebus") {
             "ServiceBusConfig.java" template: "/templates/springboot/service-bus/service-bus-config.java.tmpl",
@@ -65,26 +63,20 @@ servicebus.stub=true
         ProjectFile componentTestConfigFile = basicProject.findComponentTestConfig()
 
         ProjectFile applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application.properties")
-        applicationPropertiesFile.append("""\
-servicebus.${formatter.topicNameSnakeCase}.session_enabled=${sessionEnabled}
-""")
+        applicationPropertiesFile.addProperty("servicebus.${formatter.topicNameSnakeCase}.session_enabled", "${sessionEnabled}")
 
         ProjectFile applicationLocalPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
-        applicationLocalPropertiesFile.append("""\
-servicebus.${formatter.topicNameSnakeCase}.producer_connection_url=Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2Ftest&sig=test
-""")
-        applicationLocalPropertiesFile.append("""\
-servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2Ftest%2Fsubscriptions%2Ftest&sig=test
-""")
+        applicationLocalPropertiesFile.addProperty("servicebus.${formatter.topicNameSnakeCase}.producer_connection_url",
+                                                   "Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2Ftest&sig=test")
+        applicationLocalPropertiesFile.addProperty("servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url",
+                                                   "Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2Ftest%2Fsubscriptions%2Ftest&sig=test")
         if (publisher) {
-            applicationPropertiesFile.append("""\
-servicebus.${formatter.topicNameSnakeCase}.producer_connection_url=\${APPSETTING_ServiceBus__${formatter.topicNameSnakeCase}__Send}
-""")
+            applicationPropertiesFile.addProperty("servicebus.${formatter.topicNameSnakeCase}.producer_connection_url",
+                                                  "\${APPSETTING_ServiceBus__${formatter.topicNameSnakeCase}__Send}")
         }
         if (consumer) {
-            applicationPropertiesFile.append("""\
-servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=\${APPSETTING_ServiceBus__${formatter.topicNameSnakeCase}__Listen}
-""")
+            applicationPropertiesFile.addProperty("servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url",
+                                                  "\${APPSETTING_ServiceBus__${formatter.topicNameSnakeCase}__Listen}")
         }
 
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/servicebus") {
@@ -95,7 +87,7 @@ servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=\${APPSETTING
         }
 
         ProjectFile serviceBusConfigFile = basicProject.findFile("ServiceBusConfig.java")
-        FileUtils.appendBeforeLine(serviceBusConfigFile, "public class", "@EnableConfigurationProperties(${formatter.propertiesClassName}.class)")
+        serviceBusConfigFile.addClassAnnotation("@EnableConfigurationProperties(${formatter.propertiesClassName}.class)")
 
         ProjectFile applicationClass = basicProject.findFile("${basicProject.serviceName}.java")
         applicationClass.addImport("${servicePackage}.servicebus.ServiceBusConfig")

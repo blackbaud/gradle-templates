@@ -11,7 +11,11 @@ class PerformanceTestsProject {
     void initPerformanceTests() {
         basicProject.initPerformanceTestProject()
         File ignoreFile = basicProject.getProjectFileOrFail(".gitignore")
-        ignoreFile.append("\n\n# Performance test results\nresults/")
+        ignoreFile.append("""
+
+# Performance test results
+results/
+""")
     }
 
 }

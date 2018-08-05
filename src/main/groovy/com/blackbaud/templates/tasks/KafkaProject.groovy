@@ -1,5 +1,6 @@
 package com.blackbaud.templates.tasks
 
+import com.blackbaud.templates.BuildFile
 import com.blackbaud.templates.CurrentVersions
 
 
@@ -24,13 +25,14 @@ class KafkaProject {
     }
 
     void initKafka() {
-        basicProject.applyPlugin("kafka")
+        BuildFile buildFile = basicProject.buildFile
 
-        FileUtils.appendAfterLine(basicProject.getBuildFile(), /ext \{/,
+        buildFile.applyPlugin("kafka")
+        buildFile.appendAfterLine(/ext \{/,
                 "        commonKafkaVersion = \"${CurrentVersions.COMMON_KAFKA_MAJOR_VERSION}.+\"")
-        FileUtils.appendAfterLine(basicProject.getBuildFile(), /compile.*common-spring-boot/,
+        buildFile.appendAfterLine(/compile.*common-spring-boot/,
                 '    compile "com.blackbaud:common-kafka:${commonKafkaVersion}"')
-        FileUtils.appendAfterLine(basicProject.getBuildFile(), /sharedTestCompile/,
+        buildFile.appendAfterLine(/sharedTestCompile/,
                 '    sharedTestCompile "com.blackbaud:common-kafka-test:${commonKafkaVersion}"')
 
         basicProject.appendServiceToAppDescriptor("kafka")

@@ -1,5 +1,6 @@
 package com.blackbaud.templates.tasks
 
+import com.blackbaud.templates.BuildFile
 import com.blackbaud.templates.CurrentVersions
 import com.blackbaud.templates.ProjectFile
 
@@ -61,19 +62,15 @@ class DatasourceProject {
     }
 
     private void applyPersistenceTestAnnotationIfFileExists(String fileName) {
-        File testFile = basicProject.findOptionalFile(fileName)
+        ProjectFile testFile = basicProject.findOptionalFile(fileName)
         if (testFile != null) {
-            FileUtils.appendAfterLine(testFile, /@Retention/,
-                                      "@PersistenceTest"
-            )
+            testFile.appendAfterLine(/@Retention/,"@PersistenceTest")
         }
     }
 
     private void applyPostgresApplicationProperties() {
         File componentTestPropertiesFile = basicProject.getProjectFile("src/sharedTest/resources/application-test.properties")
-        componentTestPropertiesFile.append("""
-spring.datasource.url=jdbc:postgresql://docker.localhost:5432/\${spring.application.name}-test
-""")
+        componentTestPropertiesFile.addPropertyWithSeparator("spring.datasource.url", "jdbc:postgresql://docker.localhost:5432/\${spring.application.name}-test")
 
         File applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
         applicationPropertiesFile.append("""
@@ -87,20 +84,17 @@ spring.datasource.validation-query=SELECT 1;
     }
 
     private applyPostgresCompileDependencies() {
-        FileUtils.appendAfterLine(basicProject.getProjectFile("build.gradle"), 'compile "com.blackbaud:common-spring-boot-rest:', """\
-    compile "com.blackbaud:common-spring-boot-persistence:\${commonSpringBootVersion}"
+        basicProject.buildFile.appendAfterLine('compile "com.blackbaud:common-spring-boot-rest:', '''\
+    compile "com.blackbaud:common-spring-boot-persistence:${commonSpringBootVersion}"
     compile "postgresql:postgresql:9.0-801.jdbc4"
-    compile "org.liquibase:liquibase-core\""""
+    compile "org.liquibase:liquibase-core"'''
         )
     }
 
     private void applyEntityScan() {
-        String entityScan = "@EntityScan({\"${servicePackage}\", \"com.blackbaud.boot.converters\"})"
-        String entityScanImport = "import org.springframework.boot.autoconfigure.domain.EntityScan;"
-        File applicationClassFile = basicProject.findFile("${serviceName}.java")
-
-        FileUtils.appendAfterLine(applicationClassFile, "@SpringBootApplication", entityScan)
-        FileUtils.appendAfterLine(applicationClassFile, "autoconfigure.SpringBootApplication", entityScanImport)
+        ProjectFile applicationClassFile = basicProject.findFile("${serviceName}.java")
+        applicationClassFile.addImport("org.springframework.boot.autoconfigure.domain.EntityScan")
+        applicationClassFile.addClassAnnotation("@EntityScan({\"${servicePackage}\", \"com.blackbaud.boot.converters\"})")
     }
 
     private createLiquibaseChangeLog() {
@@ -143,21 +137,21 @@ spring.datasource.validation-query=SELECT 1;
     }
 
     private applyCommonCosmosCompileDependencies() {
-        File buildFile = basicProject.getProjectFile("build.gradle")
+        BuildFile buildFile = basicProject.buildFile
 
         if (buildFile.text.contains("commonSpringBootMajorVersion") == false) {
-            FileUtils.appendAfterLine(buildFile, /springBootVersion\s*=/, """\
+            buildFile.appendAfterLine(/springBootVersion\s*=/, """\
         commonSpringBootMajorVersion = "${CurrentVersions.COMMON_SPRING_BOOT_MAJOR_VERSION}\"""")
-            FileUtils.replaceLine(buildFile, /commonSpringBootVersion\s*=/, '''\
+            buildFile.replaceLine(/commonSpringBootVersion\s*=/, '''\
         commonSpringBootVersion = "${springBootVersion}-${commonSpringBootMajorVersion}.+"''')
         }
-        FileUtils.appendAfterLine(buildFile, /commonSpringBootVersion\s*=/, """\
+        buildFile.appendAfterLine(/commonSpringBootVersion\s*=/, """\
         commonCosmosVersion = "\${springBootVersion}-\${commonSpringBootMajorVersion}-${CurrentVersions.COMMON_COSMOS_MAJOR_VERSION}.+\"""")
 
         // TODO: for some reason, if spring-data-commons and spring-data-mongodb are not included (they are transitive
         // deps of common-cosmos), the wrong version will be pulled in... this is possibly due to default versions
         // pulled in by the spring-boot plugin.  need to investigate.
-        FileUtils.appendAfterLine(buildFile, 'compile "com.blackbaud:common-spring-boot-rest:', '''\
+        buildFile.appendAfterLine('compile "com.blackbaud:common-spring-boot-rest:', '''\
     compile "com.blackbaud:common-cosmos:${commonCosmosVersion}"
     compile "org.springframework.data:spring-data-commons:1.13.8.RELEASE"
     compile "org.springframework.data:spring-data-mongodb:1.10.11.RELEASE"''')
@@ -177,14 +171,10 @@ spring.datasource.validation-query=SELECT 1;
 
     private void applyCosmosApplicationProperties() {
         File componentTestPropertiesFile = basicProject.getProjectFile("src/componentTest/resources/application-componentTest.properties")
-        componentTestPropertiesFile.append("""
-spring.data.mongodb.database=\${spring.application.name}-test
-""")
+        componentTestPropertiesFile.addPropertyWithSeparator("spring.data.mongodb.database", '${spring.application.name}-test')
 
         File applicationPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
-        applicationPropertiesFile.append("""
-spring.data.mongodb.uri=mongodb://docker.localhost:27017
-""")
+        applicationPropertiesFile.addPropertyWithSeparator("spring.data.mongodb.uri", "mongodb://docker.localhost:27017")
     }
 
 }

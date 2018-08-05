@@ -1,5 +1,6 @@
 package com.blackbaud.templates.tasks
 
+import com.blackbaud.templates.BuildFile
 import com.blackbaud.templates.CurrentVersions
 import com.blackbaud.templates.ProjectFile
 import org.gradle.api.GradleException
@@ -118,12 +119,13 @@ class BasicProject {
         }
     }
 
-    File getBuildFile() {
-        getProjectFileOrFail("build.gradle")
+    BuildFile getBuildFile() {
+        ProjectFile file = getProjectFileOrFail("build.gradle")
+        new BuildFile(file)
     }
 
     void applyPlugin(String pluginName) {
-        FileUtils.appendAfterLine(getBuildFile(), /apply\s+plugin:\s+"blackbaud-internal/, /apply plugin: "${pluginName}"/)
+        buildFile.applyPlugin(pluginName)
     }
 
     private void initBasicGradleBuild() {
@@ -223,13 +225,13 @@ class BasicProject {
     }
 
     void appendServiceToAppDescriptor(String service) {
-        File appDescriptor = getProjectFileOrFail("src/deploy/cloudfoundry/app-descriptor.yml")
+        ProjectFile appDescriptor = getProjectFileOrFail("src/deploy/cloudfoundry/app-descriptor.yml")
         if (appDescriptor.text.contains("services:")) {
-            FileUtils.appendAfterLine(appDescriptor, "services:", """\
+            appDescriptor.appendAfterLine("services:", """\
     - ${service}""")
 
         } else {
-            FileUtils.appendAfterLine(appDescriptor, "type:", """\
+            appDescriptor.appendAfterLine("type:", """\
   services:
     - ${service}""")
 
@@ -256,9 +258,8 @@ class BasicProject {
 
             includeGradleSubmodule("${type}-client")
 
-            File buildFile = getProjectFileOrFail("build.gradle")
-            FileUtils.appendAfterLine(buildFile, /^dependencies \{/, "    compile project(\"${type}-client\")")
-            FileUtils.appendBeforeLine(buildFile, /sharedTest/, "    sharedTestCompile project(path: \"${type}-client\", configuration: \"mainTestRuntime\")")
+            buildFile.appendAfterLine(/^dependencies \{/, "    compile project(\"${type}-client\")")
+            buildFile.appendBeforeLine(/sharedTest/, "    sharedTestCompile project(path: \"${type}-client\", configuration: \"mainTestRuntime\")")
         }
     }
 
@@ -315,7 +316,7 @@ class BasicProject {
 
             ProjectFile coreARandom = findFile("CoreARandom.java")
             coreARandom.addImport("${apiPackage}.${randomBuilderSupportClassName}")
-            FileUtils.appendAfterLine(coreARandom, /\s+.*CoreRandomBuilderSupport coreRandomBuilderSupport.*/, """\
+            coreARandom.appendAfterLine(/\s+.*CoreRandomBuilderSupport coreRandomBuilderSupport.*/, """\
     @Delegate
     private ${randomBuilderSupportClassName} ${typeLowerCamelCase}ClientRandomBuilderSupport = new ${randomBuilderSupportClassName}();"""
             )

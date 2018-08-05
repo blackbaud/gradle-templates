@@ -1,5 +1,6 @@
 package com.blackbaud.templates.tasks
 
+import com.blackbaud.templates.BuildFile
 import com.blackbaud.templates.CurrentVersions
 
 
@@ -24,11 +25,12 @@ class EventHubsProject {
     }
 
     void initEventHubs(String name) {
-        FileUtils.appendAfterLine(basicProject.getBuildFile(), /commonSpringBootVersion\s*=\s*"\$\{springBootVersion}/,
+        BuildFile buildFile = basicProject.buildFile
+        buildFile.appendAfterLine(/commonSpringBootVersion\s*=\s*"\$\{springBootVersion}/,
                                       "        commonEventHubsVersion = \"${CurrentVersions.COMMON_ASYNC_MAJOR_VERSION}.+\"")
-        FileUtils.appendAfterLine(basicProject.getBuildFile(), /compile.*common-spring-boot/,
+        buildFile.appendAfterLine(/compile.*common-spring-boot/,
                 '    compile "com.blackbaud:common-async-event-hubs:${commonEventHubsVersion}"')
-        FileUtils.appendAfterLine(basicProject.getBuildFile(), /sharedTestCompile/,
+        buildFile.appendAfterLine(/sharedTestCompile/,
                 '    sharedTestCompile "com.blackbaud:common-async-event-hubs-test:${commonEventHubsVersion}"')
 
         File componentTestPropertiesFile = basicProject.getProjectFile("src/componentTest/resources/application-componentTest.properties")

@@ -313,7 +313,7 @@ class BasicProject {
             }
 
             File coreARandom = findFile("CoreARandom.java")
-            FileUtils.appendAfterLine(coreARandom, "import", "import ${apiPackage}.${randomBuilderSupportClassName};")
+            FileUtils.addImport(coreARandom, "${apiPackage}.${randomBuilderSupportClassName}")
             FileUtils.appendAfterLine(coreARandom, /\s+.*CoreRandomBuilderSupport coreRandomBuilderSupport.*/, """\
     @Delegate
     private ${randomBuilderSupportClassName} ${typeLowerCamelCase}ClientRandomBuilderSupport = new ${randomBuilderSupportClassName}();"""

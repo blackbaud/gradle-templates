@@ -114,9 +114,7 @@ servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=\${APPSETTING
             FileUtils.addImport(publisherConfigFile, "${servicePackage}.servicebus.${formatter.propertiesClassName}")
         }
 
-        FileUtils.addImport(publisherConfigFile, "org.springframework.beans.factory.annotation.Qualifier")
         FileUtils.addImport(publisherConfigFile, "com.blackbaud.azure.servicebus.publisher.JsonMessagePublisher")
-        FileUtils.addImport(publisherConfigFile, "com.blackbaud.azure.servicebus.config.ServiceBusProperties")
         FileUtils.addImport(publisherConfigFile, "com.blackbaud.azure.servicebus.publisher.ServiceBusPublisherBuilder")
         FileUtils.appendToClass(publisherConfigFile, """
     @Bean
@@ -158,6 +156,7 @@ servicebus.${formatter.topicNameSnakeCase}.consumer_connection_url=\${APPSETTING
         } else {
             addConsumerImports(componentTestConfigFile)
             FileUtils.addImport(componentTestConfigFile, "com.blackbaud.azure.servicebus.consumer.handlers.ValidatingServiceBusMessageHandler")
+            FileUtils.addImport(componentTestConfigFile, "org.springframework.beans.factory.annotation.Qualifier")
             FileUtils.appendToClass(componentTestConfigFile, """
     @Bean
     public ValidatingServiceBusMessageHandler<${formatter.payloadClassName}> ${formatter.messageHandlerClassName}() {

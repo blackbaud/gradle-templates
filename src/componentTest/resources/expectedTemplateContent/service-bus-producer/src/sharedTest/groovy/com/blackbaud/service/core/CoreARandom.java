@@ -1,7 +1,7 @@
 package com.blackbaud.service.core;
 
-import com.blackbaud.testsupport.RandomGenerator;
 import com.blackbaud.service.api.ServiceBusClientRandomBuilderSupport;
+import com.blackbaud.testsupport.RandomGenerator;
 import lombok.experimental.Delegate;
 
 public class CoreARandom {

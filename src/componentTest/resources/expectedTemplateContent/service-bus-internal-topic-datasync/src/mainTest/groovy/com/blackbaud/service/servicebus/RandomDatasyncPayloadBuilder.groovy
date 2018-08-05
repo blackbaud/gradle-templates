@@ -1,10 +1,10 @@
-package com.blackbaud.service.servicebus;
+package com.blackbaud.service.servicebus
 
 import static com.blackbaud.service.servicebus.ServiceBusClientARandom.aRandom
 
 class RandomDatasyncPayloadBuilder extends DatasyncPayload.DatasyncPayloadBuilder {
 
-    public RandomDatasyncPayloadBuilder() {
+    RandomDatasyncPayloadBuilder() {
         throw new RuntimeException("add some stuff")
     }
 

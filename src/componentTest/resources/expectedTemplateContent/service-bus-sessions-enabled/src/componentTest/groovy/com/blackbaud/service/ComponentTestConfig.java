@@ -1,9 +1,7 @@
 package com.blackbaud.service;
 
 import com.blackbaud.azure.servicebus.publisher.ServiceBusPublisherBuilder;
-import com.blackbaud.azure.servicebus.config.ServiceBusProperties;
 import com.blackbaud.azure.servicebus.publisher.JsonMessagePublisher;
-import org.springframework.beans.factory.annotation.Qualifier;
 import com.blackbaud.service.servicebus.ProducerServiceBusProperties;
 import com.blackbaud.service.core.CoreRandomBuilderSupport;
 import com.blackbaud.testsupport.BaseTestConfig;

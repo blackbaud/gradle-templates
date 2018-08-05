@@ -13,7 +13,11 @@ class FileUtils {
 
     static void addImport(File file, String importToAdd) {
         if (file.text.contains("import ${importToAdd}") == false) {
-            appendBeforeLine(file, /import .*/, "import ${importToAdd};")
+            String eol = file.name.endsWith(".java") ? ";" : ""
+            if (appendBeforeLine(file, /import .*/, "import ${importToAdd}${eol}") == false) {
+                appendAfterLine(file, /package .*/, """
+import ${importToAdd}${eol}""")
+            }
         }
     }
 
@@ -40,7 +44,7 @@ class FileUtils {
         return -1
     }
 
-    static void replaceLine(File file, String match, String lineToReplace) {
+    static boolean replaceLine(File file, String match, String lineToReplace) {
         List<String> lines = file.readLines()
         int index = indexOf(lines, match)
 
@@ -48,9 +52,10 @@ class FileUtils {
             lines[index] = lineToReplace
             file.text = lines.join(LINE_SEPARATOR) + LINE_SEPARATOR
         }
+        index >= 0
     }
 
-    static void appendBeforeLine(File file, String match, String lineToAdd) {
+    static boolean appendBeforeLine(File file, String match, String lineToAdd) {
         List<String> lines = file.readLines()
         int index = indexOf(lines, match)
 
@@ -58,9 +63,10 @@ class FileUtils {
             lines.add(index, lineToAdd)
             file.text = lines.join(LINE_SEPARATOR) + LINE_SEPARATOR
         }
+        index >= 0
     }
 
-    static void appendAfterLine(File file, String match, String lineToAdd) {
+    static boolean appendAfterLine(File file, String match, String lineToAdd) {
         List<String> lines = file.readLines()
         int index = indexOf(lines, match)
 
@@ -68,6 +74,7 @@ class FileUtils {
             lines.add(index + 1, lineToAdd)
             file.text = lines.join(LINE_SEPARATOR) + LINE_SEPARATOR
         }
+        index >= 0
     }
 
     static void appendAfterLastLine(File file, String match, String lineToAdd) {

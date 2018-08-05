@@ -1,4 +1,4 @@
-package com.blackbaud.service.core.domain;
+package com.blackbaud.service.core.domain
 
 import static com.blackbaud.service.core.CoreARandom.aRandom
 

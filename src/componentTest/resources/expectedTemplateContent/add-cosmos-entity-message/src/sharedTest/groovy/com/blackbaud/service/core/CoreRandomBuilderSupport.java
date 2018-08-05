@@ -1,11 +1,10 @@
 package com.blackbaud.service.core;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import com.blackbaud.service.core.domain.RandomCarEntityBuilder;
 import com.blackbaud.service.core.domain.CarRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 public class CoreRandomBuilderSupport {
-
 
     @Autowired
     private CarRepository carRepository;

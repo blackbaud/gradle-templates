@@ -290,10 +290,10 @@ import ${servicePackage}.client.${resourceName}Client;
         }
 
         File randomCoreBuilderSupport = basicProject.findFile("CoreRandomBuilderSupport.java")
-        FileUtils.appendAfterLine(randomCoreBuilderSupport, "package", "import ${servicePackage}.core.domain.${entityName}Repository;")
-        FileUtils.appendAfterLine(randomCoreBuilderSupport, "package", "import ${servicePackage}.core.domain.Random${entityName}EntityBuilder;")
+        FileUtils.addImport(randomCoreBuilderSupport, "${servicePackage}.core.domain.${entityName}Repository")
+        FileUtils.addImport(randomCoreBuilderSupport, "${servicePackage}.core.domain.Random${entityName}EntityBuilder")
+        FileUtils.addImport(randomCoreBuilderSupport, "org.springframework.beans.factory.annotation.Autowired")
         FileUtils.appendToClass(randomCoreBuilderSupport, """
-
     @Autowired
     private ${entityName}Repository ${entityNameLowerCamel}Repository;
 

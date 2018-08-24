@@ -119,12 +119,14 @@ authorization.filter.enable=false
             "bootstrap.properties" template: "/templates/springboot/bootstrap.properties.tmpl", serviceId: "${serviceId}"
         }
 
-        basicProject.applyTemplate("src/main/resources") {
-            "bootstrap-cloud.properties" template: "/templates/springboot/bootstrap-cloud.properties.tmpl"
-        }
+        if (vsts == false) {
+            basicProject.applyTemplate("src/main/resources") {
+                "bootstrap-cloud.properties" template: "/templates/springboot/bootstrap-cloud.properties.tmpl"
+            }
 
-        basicProject.applyTemplate("src/deploy/cloudfoundry") {
-            "app-descriptor.yml" template: "/templates/deploy/app-descriptor.yml.tmpl"
+            basicProject.applyTemplate("src/deploy/cloudfoundry") {
+                "app-descriptor.yml" template: "/templates/deploy/app-descriptor.yml.tmpl"
+            }
         }
 
         basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}") {

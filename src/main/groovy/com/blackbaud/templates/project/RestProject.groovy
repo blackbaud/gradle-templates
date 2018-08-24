@@ -323,6 +323,10 @@ authorization.filter.enable=false
                                              entityName: entityName, packageName: "${servicePackage}.core.domain"
         }
 
+        if (basicProject.findOptionalFile("CosmosConfig.java") == null) {
+            new DatasourceProject(this).initCosmos()
+        }
+
         ProjectFile cosmosConfig = basicProject.findFile("CosmosConfig.java")
         cosmosConfig.appendToClass("""
     @Bean

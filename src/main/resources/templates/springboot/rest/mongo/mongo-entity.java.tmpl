@@ -2,6 +2,7 @@ package ${packageName};
 
 import com.blackbaud.cosmos.AuditableEntity;
 import com.blackbaud.cosmos.VersionedEntity;
+import com.blackbaud.cosmos.sharded.ContributorEntity;
 import com.blackbaud.cosmos.sharded.ShardKey;
 import com.blackbaud.cosmos.sharded.ShardedEntity;
 import lombok.AllArgsConstructor;
@@ -41,11 +42,11 @@ public class ${resourceName}Entity implements ShardedEntity<ObjectId, String>, V
     private int schemaVersion = CURRENT_SCHEMA_VERSION;
 <% if (auditable) { %>
     @CreatedBy
-    private UUID createdBy;
+    private ContributorEntity createdBy;
     @CreatedDate
-    private LocalDateTime creationDate;
+    private LocalDateTime createdDate;
     @LastModifiedBy
-    private UUID lastModifiedBy;
+    private ContributorEntity lastModifiedBy;
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;<% } %>
 

@@ -24,7 +24,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = AccountEntity.COLLECTION_NAME)
+@Document(collection = ${resourceName}Entity.COLLECTION_NAME)
 public class ${resourceName}Entity implements ShardedEntity<ObjectId, String>, VersionedEntity<% if (auditable) { %>, AuditableEntity<% } %> {
 
     public static final String COLLECTION_NAME = "${collectionName}";

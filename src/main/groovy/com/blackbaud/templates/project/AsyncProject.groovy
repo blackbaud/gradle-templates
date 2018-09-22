@@ -65,9 +65,9 @@ class AsyncProject {
 
         ProjectFile applicationLocalPropertiesFile = basicProject.getProjectFile("src/main/resources/application-local.properties")
         applicationLocalPropertiesFile.addProperty("servicebus.${formatter.topicNameKebabCase}.producer-connection-url",
-                                                   "Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2Ftest&sig=test")
+                                                   "Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2F${formatter.topicNameKebabCase}&sig=test")
         applicationLocalPropertiesFile.addProperty("servicebus.${formatter.topicNameKebabCase}.consumer-connection-url",
-                                                   "Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2Ftest%2Fsubscriptions%2Ftest&sig=test")
+                                                   "Endpoint=sb://test.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2F${formatter.topicNameKebabCase}%2Fsubscriptions%2Ftest&sig=test")
         if (publisher) {
             applicationPropertiesFile.addProperty("servicebus.${formatter.topicNameKebabCase}.producer-connection-url",
                                                   "\${APPSETTING_ServiceBus__${formatter.topicNameSnakeCase}__Send}")

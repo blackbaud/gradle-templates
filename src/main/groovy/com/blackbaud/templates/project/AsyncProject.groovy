@@ -85,7 +85,7 @@ class AsyncProject {
         }
 
         ProjectFile serviceBusConfigFile = basicProject.findFile("ServiceBusConfig.java")
-        serviceBusConfigFile.addClassAnnotation("@EnableConfigurationProperties(${formatter.propertiesClassName}.class)")
+        serviceBusConfigFile.enableConfigurationProperties("${formatter.propertiesClassName}.class")
 
         ProjectFile applicationClass = basicProject.findFile("${basicProject.serviceName}.java")
         applicationClass.addImport("${servicePackage}.servicebus.ServiceBusConfig")

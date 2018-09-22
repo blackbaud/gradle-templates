@@ -41,8 +41,10 @@ import ${importToAdd}${eol}""")
         if (index >= 0) {
             String importLine = lines[index]
             String imports = (importLine =~ /@Import\(\{?([^}]+)\}?\)/)[0][1]
-            lines[index] = "@Import({${imports}, ${importToAdd}})".toString()
-            text = lines.join(LINE_SEPARATOR) + LINE_SEPARATOR
+            if (imports.contains(importToAdd) == false) {
+                lines[index] = "@Import({${imports}, ${importToAdd}})".toString()
+                text = lines.join(LINE_SEPARATOR) + LINE_SEPARATOR
+            }
         } else {
             appendBeforeLine(/class\s+/, "@Import(${importToAdd})")
         }

@@ -28,7 +28,7 @@ public class ComponentTestConfig extends BaseTestConfig {
     }
 
     @Bean
-    public ValidatingServiceBusMessageHandler<ProducerPayload> ProducerMessageHandler() {
+    public ValidatingServiceBusMessageHandler<ProducerPayload> producerMessageHandler() {
         return new ValidatingServiceBusMessageHandler<>("producerHandler");
     }
 

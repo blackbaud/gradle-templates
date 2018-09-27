@@ -150,7 +150,7 @@ class AsyncProject {
             componentTestConfigFile.addImport("org.springframework.beans.factory.annotation.Qualifier")
             componentTestConfigFile.appendToClass("""
     @Bean
-    public ValidatingServiceBusMessageHandler<${formatter.payloadClassName}> ${formatter.messageHandlerClassName}() {
+    public ValidatingServiceBusMessageHandler<${formatter.payloadClassName}> ${formatter.topicNameCamelCase}MessageHandler() {
         return new ValidatingServiceBusMessageHandler<>("${formatter.topicNameCamelCase}Handler");
     }
 

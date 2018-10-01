@@ -185,7 +185,7 @@ class AsyncProject {
         }
         if (consumer) {
             applicationVstsTestPropertiesFile.addProperty("servicebus.${formatter.topicNameKebabCase}.consumer_connection_url",
-                                                          "Endpoint=sb://namespace.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Fnamespace.servicebus.windows.net%2F${formatter.topicNameKebabCase}%2Fsubscriptions%2Fsubscription_name&sig=token&se=1696020226&skn=shared_access_profile_listen // TODO:: Create REX service bus topic and replace")
+                                                          "Endpoint=sb://namespace.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Fnamespace.servicebus.windows.net%2F${formatter.topicNameKebabCase}%2Fsubscriptions%2Fsubscription_name&sig=token&se=1696020226&skn=shared_access_profile_listen // TODO: Create REX service bus topic and replace")
         }
 
         ProjectFile applicationComponentTestPropertiesFile = basicProject.getProjectFile("src/main/resources/application-componentTest.properties")

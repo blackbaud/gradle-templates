@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="com/blackbaud/boot/logback/common-logback.xml" />
+    <include resource="com/blackbaud/async/logback/common-async.xml"/>
 
 	<logger name="com.blackbaud" level="DEBUG"/>
 
@@ -11,6 +12,7 @@
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
         <!-- Add custom rules here -->
+        <applyCustomRuleSets>common-service-bus</applyCustomRuleSets>
     </appender>
 
     <root level="INFO">

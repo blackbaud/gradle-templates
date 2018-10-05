@@ -40,9 +40,9 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         new RestProject(basicProject)
     }
 
-    private RestProject initRestProject(boolean vsts = true) {
+    private RestProject initRestProject(boolean aws = false) {
         RestProject restProject = createRestProject()
-        restProject.initRestProject(false, vsts == false)
+        restProject.initRestProject(false, aws)
         restProject
     }
 

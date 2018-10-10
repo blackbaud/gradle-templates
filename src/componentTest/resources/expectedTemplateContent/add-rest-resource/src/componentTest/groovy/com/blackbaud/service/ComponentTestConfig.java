@@ -1,7 +1,6 @@
 package com.blackbaud.service;
 
-import import com.blackbaud.service.client.HelloClient;
-import import org.springframework.context.annotation.Bean;
+import com.blackbaud.service.client.HelloClient;
 import com.blackbaud.service.core.CoreRandomBuilderSupport;
 import com.blackbaud.testsupport.BaseTestConfig;
 import com.blackbaud.testsupport.TestClientSupport;

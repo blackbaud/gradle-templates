@@ -1,5 +1,0 @@
-ext.artifactId = "${artifactId}-service-bus-client"
-
-publishing_ext {
-    publication('mainTest')
-}

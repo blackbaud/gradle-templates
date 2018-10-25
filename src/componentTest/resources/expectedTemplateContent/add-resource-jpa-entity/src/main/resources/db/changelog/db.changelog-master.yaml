@@ -1,4 +1,0 @@
-databaseChangeLog:
-
-  - include:
-      file: db/create_account.sql

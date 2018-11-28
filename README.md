@@ -50,6 +50,10 @@ Supported task options:
 * serviceName - the name of the SpringBoot application entrypoint, defaults to the repository name, converted to upper camel-case
 * servicePackageName - the name of the core package (contains the application entrypoint), defaults to "com.blackbaud.${serviceName.toLowercase()}"
 
+#### createIntegrationTestProject
+
+Creates a basic integration test project.
+
 ### Project Augmentation Tasks
 
 The project augmentation tasks are available when run from this project but also when the `blackbaud-templates` plugin

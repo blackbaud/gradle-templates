@@ -87,10 +87,10 @@ class AsyncProject {
         ProjectFile serviceBusConfigFile = basicProject.findFile("ServiceBusConfig.java")
         serviceBusConfigFile.enableConfigurationProperties("${formatter.propertiesClassName}.class")
 
-        ProjectFile applicationClass = basicProject.findFile("${basicProject.serviceName}.java")
-        applicationClass.addImport("${servicePackage}.servicebus.ServiceBusConfig")
-        applicationClass.addImport("org.springframework.context.annotation.Import")
-        applicationClass.addConfigurationImport("ServiceBusConfig.class")
+        ProjectFile coreConfigClass = basicProject.findFile("CoreConfig.java")
+        coreConfigClass.addImport("${servicePackage}.servicebus.ServiceBusConfig")
+        coreConfigClass.addImport("org.springframework.context.annotation.Import")
+        coreConfigClass.addConfigurationImport("ServiceBusConfig.class")
 
         ProjectFile publisherConfigFile
         if (publisher) {

@@ -101,8 +101,12 @@ authorization.filter.enable=false
 
     private void createRestBase() {
         basicProject.applyTemplate("src/main/java/${servicePackagePath}") {
-            "${serviceName}.java" template: "/templates/springboot/application-class.java.tmpl",
+            "${serviceName}.java" template: "/templates/springboot/rest/application-class.java.tmpl",
                     serviceName: serviceName, servicePackage: servicePackage
+        }
+        basicProject.applyTemplate("src/main/java/${servicePackagePath}/core") {
+            "CoreConfig.java" template: "/templates/springboot/rest/application-core-config.java.tmpl",
+                    packageName: "${servicePackage}.core"
         }
 
         basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}") {

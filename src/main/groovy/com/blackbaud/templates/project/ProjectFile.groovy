@@ -43,16 +43,9 @@ import ${importToAdd}${eol}""")
     }
 
     private void addClassToAnnotation(String annotationName, String classToAdd) {
-        List<String> lines = readLines()
-        int index = indexOf(lines, /@${annotationName}/)
-
-        if (index >= 0) {
-            String configPropLine = lines[index]
-            String existingClasses = (configPropLine =~ /@${annotationName}\(\{?([^}]+)\}?\)/)[0][1]
-            if (existingClasses.contains(classToAdd) == false) {
-                lines[index] = "@${annotationName}({${existingClasses}, ${classToAdd}})".toString()
-                text = lines.join(LINE_SEPARATOR) + LINE_SEPARATOR
-            }
+        String text = this.text
+        if (text.contains(/@${annotationName}/)) {
+            this.text = text.replaceFirst(/@${annotationName}\(\{?([^}]+)\}?\)/, "@${annotationName}(${classToAdd}, \$1)")
         } else {
             appendBeforeLine(/class\s+/, "@${annotationName}(${classToAdd})")
         }

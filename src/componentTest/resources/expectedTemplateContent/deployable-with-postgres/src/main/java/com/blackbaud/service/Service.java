@@ -1,18 +1,19 @@
 package com.blackbaud.service;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import com.blackbaud.boot.config.CommonSpringConfig;
+import com.blackbaud.boot.config.WebMvcRestServiceConfig;
+import com.blackbaud.service.core.CoreConfig;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
-@SpringBootApplication
-@ComponentScan({"com.blackbaud.service.core", "com.blackbaud.service.resources"})
+@Configuration
+@ComponentScan("com.blackbaud.service.resources")
+@Import({
+        CoreConfig.class,
+        WebMvcRestServiceConfig.class,
+})
 @EntityScan({"com.blackbaud.service", "com.blackbaud.boot.converters"})
 public class Service extends CommonSpringConfig {
 

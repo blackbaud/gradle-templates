@@ -1,7 +1,7 @@
 package com.blackbaud.service;
 
 import org.springframework.context.annotation.Import;
-import com.blackbaud.service.config.CosmosConfig;
+import com.blackbaud.service.core.CosmosConfig;
 import com.blackbaud.boot.config.CommonSpringConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

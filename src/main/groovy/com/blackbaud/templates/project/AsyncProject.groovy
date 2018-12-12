@@ -31,8 +31,8 @@ class AsyncProject {
         }
 
         buildFile.appendAfterLastLine(/ext \{/,
-                "        commonAsyncServiceBusVersion = \"${CurrentVersions.COMMON_ASYNC_MAJOR_VERSION}.+\"")
-        buildFile.appendAfterLine(/compile.*common-spring-boot/,
+                "        commonAsyncServiceBusVersion = \"${CurrentVersions.COMMON_SERVICE_BUS_MAJOR_VERSION}.+\"")
+        buildFile.appendAfterLine(/compile.*common-deployable-spring-boot/,
                 '    compile "com.blackbaud:common-async-service-bus:${commonAsyncServiceBusVersion}"')
         buildFile.appendAfterLine(/sharedTestCompile/,
                 '    sharedTestCompile "com.blackbaud:common-async-service-bus-test:${commonAsyncServiceBusVersion}"')

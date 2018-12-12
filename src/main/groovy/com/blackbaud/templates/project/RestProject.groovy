@@ -39,40 +39,26 @@ class RestProject {
         basicProject
     }
 
-    void initRestProject(boolean shouldDisableAuthFilter, boolean aws) {
+    void initRestProject(boolean shouldDisableAuthFilter) {
         basicProject.initGradleProject()
 
         basicProject.addLombokConfig()
         basicProject.commitProjectFiles("add lombok config")
 
-        createRestBase(aws)
+        createRestBase()
 
         if (shouldDisableAuthFilter) {
             disableAuthFilter()
         } else {
-            enableAuthFilter(aws)
+            enableAuthFilter()
         }
     }
 
-    private void enableAuthFilter(boolean aws) {
-        basicProject.buildFile.appendBeforeLine(/compile "com.blackbaud:common-spring-boot-rest.*/,
-                "    compile \"com.blackbaud:tokens-client:${CurrentVersions.TOKENS_CLIENT_MAJOR_VERSION}.+\"")
-
-        if (aws) {
-            ProjectFile applicationClassFile = basicProject.findFile("${serviceName}.java")
-            applicationClassFile.addImport("com.blackbaud.security.CoreSecurityEcosystemParticipantRequirementsProvider")
-            applicationClassFile.appendAfterLine(/public class .*/, """
-    @Bean
-    public CoreSecurityEcosystemParticipantRequirementsProvider coreSecurityEcosystemParticipantRequirementsProvider() {
-        return new CoreSecurityEcosystemParticipantRequirementsProvider();
-    }""")
-        } else {
-            File applicationProperties = basicProject.getProjectFileOrFail("src/main/resources/application.properties")
-            applicationProperties << """\
+    private void enableAuthFilter() {
+        File applicationProperties = basicProject.getProjectFileOrFail("src/main/resources/application.properties")
+        applicationProperties << """\
 bbauth.enabled=true
-long.token.enabled=false
 """
-        }
 
         basicProject.commitProjectFiles("enable auth filter")
     }
@@ -113,25 +99,10 @@ authorization.filter.enable=false
         basicProject.commitProjectFiles("initialize kafka")
     }
 
-    private void createRestBase(boolean aws) {
+    private void createRestBase() {
         basicProject.applyTemplate("src/main/java/${servicePackagePath}") {
             "${serviceName}.java" template: "/templates/springboot/application-class.java.tmpl",
                     serviceName: serviceName, servicePackage: servicePackage
-        }
-
-        basicProject.applyTemplate("src/main/resources") {
-            "bootstrap.properties" template: "/templates/springboot/bootstrap.properties.tmpl",
-                                   serviceId: "${serviceId}", useConfigServer: aws ? "true" : "false"
-        }
-
-        if (aws) {
-            basicProject.applyTemplate("src/main/resources") {
-                "bootstrap-cloud.properties" template: "/templates/springboot/bootstrap-cloud.properties.tmpl"
-            }
-
-            basicProject.applyTemplate("src/deploy/cloudfoundry") {
-                "app-descriptor.yml" template: "/templates/deploy/app-descriptor.yml.tmpl"
-            }
         }
 
         basicProject.applyTemplate("src/componentTest/groovy/${servicePackagePath}") {
@@ -164,8 +135,8 @@ authorization.filter.enable=false
                 'main' {
                     'resources' {
                         'application.properties' template: "/templates/springboot/rest/application.properties.tmpl",
-                                                 resourcePackageName: "${servicePackage}.resources"
-                        'logback.xml' template: "/templates/logback/logback-${aws ? "aws" : "vsts"}.tmpl"
+                                                 serviceId: "${serviceId}", resourcePackageName: "${servicePackage}.resources"
+                        'logback.xml' template: "/templates/logback/logback-vsts.tmpl"
                     }
                 }
                 'test' {

@@ -41,9 +41,9 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         new RestProject(basicProject)
     }
 
-    private RestProject initRestProject(boolean aws = false) {
+    private RestProject initRestProject() {
         RestProject restProject = createRestProject()
-        restProject.initRestProject(false, aws)
+        restProject.initRestProject(false)
         restProject
     }
 
@@ -163,7 +163,7 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         IntegrationTestProject integrationTestProject = new IntegrationTestProject(basicProject)
 
         when:
-        integrationTestProject.initIntegrationTestProject(false, true)
+        integrationTestProject.initIntegrationTestProject(false)
 
         then:
         greenwashOrAssertExpectedContent(basicProject.targetDir, "integration-test")
@@ -174,7 +174,7 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         RestProject restProject = createRestProject()
 
         when:
-        restProject.initRestProject(false, false)
+        restProject.initRestProject(false)
 
         then:
         greenwashOrAssertExpectedContent(restProject, "deployable")
@@ -185,7 +185,7 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         RestProject restProject = createRestProject()
 
         when:
-        restProject.initRestProject(false, true)
+        restProject.initRestProject(false)
         restProject.initPostgres()
         restProject.initMybatis()
 
@@ -198,7 +198,7 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         RestProject restProject = createRestProject()
 
         when:
-        restProject.initRestProject(false, true)
+        restProject.initRestProject(false)
         restProject.initKafka()
 
         then:
@@ -210,7 +210,7 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         RestProject restProject = createRestProject()
 
         when:
-        restProject.initRestProject(false, false)
+        restProject.initRestProject(false)
         restProject.initCosmos()
 
         then:

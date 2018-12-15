@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 @Configuration
 @EnableMongoRepositories(basePackages = CosmosConfig.REPOSITORY_AND_ENTITY_BASE_PACKAGE, repositoryBaseClass = ShardedMongoRepositoryImpl.class)
 public class CosmosConfig extends MongoCosmosConfig {

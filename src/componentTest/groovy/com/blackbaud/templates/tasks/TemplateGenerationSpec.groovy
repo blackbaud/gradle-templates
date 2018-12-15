@@ -22,7 +22,7 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
     boolean greenwash
 
     def setup() {
-        project.ext["blackbaudGradleVersion"] = "2.14.1-bb.1.2"
+        project.ext["blackbaudGradleVersion"] = "4.10.3-bb.1.0"
         greenwash = Boolean.getBoolean("greenwash")
     }
 

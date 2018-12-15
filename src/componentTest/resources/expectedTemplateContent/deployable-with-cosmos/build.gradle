@@ -38,7 +38,7 @@ dependencies {
     compile "com.blackbaud:common-deployable-spring-boot-cosmos:${commonSpringBootVersion}"
 
     sharedTestCompile "com.blackbaud:common-deployable-spring-boot-rest-test:${commonSpringBootVersion}"
-    sharedTestCompile "com.blackbaud:common-deployable-spring-boot-common-test:${commonSpringBootVersion}"
+    sharedTestCompile "com.blackbaud:common-deployable-spring-boot-cosmos-test:${commonSpringBootVersion}"
     sharedTestCompile "org.codehaus.groovy:groovy-all"
     sharedTestCompile 'cglib:cglib-nodep:2.2.2'
     sharedTestCompile 'org.objenesis:objenesis:1.3'

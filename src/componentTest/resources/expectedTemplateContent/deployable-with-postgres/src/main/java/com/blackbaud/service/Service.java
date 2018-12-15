@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import;
         WebMvcRestServiceConfig.class,
 })
 @EntityScan({"com.blackbaud.service", "com.blackbaud.boot.converters"})
-public class Service extends CommonSpringConfig {
+public class Service {
 
     public static void main(String[] args) {
         SpringApplication.run(Service.class, args);

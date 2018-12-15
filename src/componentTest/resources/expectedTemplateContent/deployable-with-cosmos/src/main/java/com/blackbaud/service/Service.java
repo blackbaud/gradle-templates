@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Import;
         CoreConfig.class,
         WebMvcRestServiceConfig.class,
 )
-public class Service extends CommonSpringConfig {
+public class Service {
 
     public static void main(String[] args) {
         SpringApplication.run(Service.class, args);

@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @ComponentScan("com.blackbaud.service.resources")
-@Import(CosmosConfig.class, 
+@Import({CosmosConfig.class, 
         CoreConfig.class,
         WebMvcRestServiceConfig.class,
-)
+})
 public class Service {
 
     public static void main(String[] args) {

@@ -45,7 +45,7 @@ import ${importToAdd}${eol}""")
     private void addClassToAnnotation(String annotationName, String classToAdd) {
         String text = this.text
         if (text.contains(/@${annotationName}/)) {
-            this.text = text.replaceFirst(/@${annotationName}\(\{?([^}]+)\}?\)/, "@${annotationName}(${classToAdd}, \$1)")
+            this.text = text.replaceFirst(/@${annotationName}\(\{?([^}]+)\}?\)/, "@${annotationName}({${classToAdd}, \$1})")
         } else {
             appendBeforeLine(/class\s+/, "@${annotationName}(${classToAdd})")
         }

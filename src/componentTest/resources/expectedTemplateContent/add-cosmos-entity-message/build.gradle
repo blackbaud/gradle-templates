@@ -10,8 +10,8 @@ buildscript {
 }
 
 apply plugin: "blackbaud-internal-rest"
-apply plugin: "mongo"
 apply plugin: "blackbaud-templates"
+apply plugin: "mongo"
 
 allprojects {
     apply plugin: "blackbaud-internal"

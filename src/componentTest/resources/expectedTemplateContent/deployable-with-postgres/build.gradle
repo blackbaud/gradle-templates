@@ -10,9 +10,9 @@ buildscript {
 }
 
 apply plugin: "blackbaud-internal-rest"
-apply plugin: "mybatis"
-apply plugin: "postgres"
 apply plugin: "blackbaud-templates"
+apply plugin: "postgres"
+apply plugin: "mybatis"
 
 allprojects {
     apply plugin: "blackbaud-internal"

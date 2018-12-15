@@ -72,6 +72,24 @@ import ${importToAdd}${eol}""")
         index >= 0
     }
 
+    boolean appendAfterFirstSetOfLines(String match, String lineToAdd) {
+        List<String> lines = readLines()
+        int index = indexOf(lines, match)
+
+        if (index >= 0) {
+            for (int i = index + 1; i < lines.size(); i++) {
+                if (lines[i] =~ /${match}/) {
+                    index = i
+                }
+                if (index != i) {
+                    lines.addAll(i, lineToAdd)
+                    break
+                }
+            }
+            text = lines.join(LINE_SEPARATOR) + LINE_SEPARATOR
+        }
+    }
+
     void appendAfterLastLine(String match, String lineToAdd) {
         List<String> lines = readLines()
         int index = 0

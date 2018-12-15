@@ -11,8 +11,8 @@ buildscript {
 }
 
 apply plugin: "blackbaud-internal-rest"
-apply plugin: "kafka"
 apply plugin: "blackbaud-templates"
+apply plugin: "kafka"
 
 allprojects {
     apply plugin: "blackbaud-internal"

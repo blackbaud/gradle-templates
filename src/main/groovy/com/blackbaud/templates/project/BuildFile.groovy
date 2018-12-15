@@ -7,7 +7,7 @@ class BuildFile extends ProjectFile {
     }
 
     void applyPlugin(String pluginName) {
-        appendAfterLine(/apply\s+plugin:\s+"blackbaud-internal/, /apply plugin: "${pluginName}"/)
+        appendAfterFirstSetOfLines(/apply\s+plugin:/, /apply plugin: "${pluginName}"/)
     }
 
     void addDependency(String type, String dependency, String exclusion = null) {

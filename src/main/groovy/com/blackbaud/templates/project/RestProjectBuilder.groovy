@@ -88,9 +88,6 @@ class RestProjectBuilder {
         if(clean) {
             basicProjectBuilder.clean()
         }
-        if (vsts) {
-            basicProjectBuilder.useVsts()
-        }
         basicProjectBuilder.build()
     }
 

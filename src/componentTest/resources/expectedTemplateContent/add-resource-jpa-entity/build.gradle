@@ -34,6 +34,7 @@ allprojects {
 
 dependencies {
     compile "com.blackbaud:common-deployable-spring-boot-rest:${commonSpringBootVersion}"
+    compile "com.blackbaud:common-deployable-spring-boot-jpa:${commonSpringBootVersion}"
 
     sharedTestCompile "com.blackbaud:common-deployable-spring-boot-rest-test:${commonSpringBootVersion}"
     sharedTestCompile "org.codehaus.groovy:groovy-all"

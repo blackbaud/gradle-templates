@@ -10,6 +10,13 @@ class BuildFile extends ProjectFile {
         appendAfterFirstSetOfLines(/apply\s+plugin:/, /apply plugin: "${pluginName}"/)
     }
 
+    void addDependencyAfter(String type, String dependency, String afterDependency) {
+        if (text.contains(dependency) == false) {
+            appendAfterLine(afterDependency, """\
+    ${type} ${dependency}""")
+        }
+    }
+
     void addDependency(String type, String dependency, String exclusion = null) {
         String dependencyString = makeDependencyString(type, dependency, exclusion)
 

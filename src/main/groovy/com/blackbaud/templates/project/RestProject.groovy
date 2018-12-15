@@ -239,6 +239,11 @@ authorization.filter.enable=false
     void addJpaEntityObject(String resourceName) {
         String resourcePath = "${UPPER_CAMEL.to(LOWER_UNDERSCORE, resourceName)}"
 
+        BuildFile buildFile = basicProject.buildFile
+        buildFile.addDependencyAfter("compile",
+                                     '"com.blackbaud:common-deployable-spring-boot-jpa:${commonSpringBootVersion}"',
+                                     ":common-deployable-spring-boot-rest:")
+
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/core/domain") {
             "${resourceName}Entity.java" template: "/templates/springboot/rest/jpa/jpa-entity.java.tmpl",
                                          resourceName: resourceName, packageName: "${servicePackage}.core.domain", tableName: resourcePath

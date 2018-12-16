@@ -1,6 +1,5 @@
 package com.blackbaud.service;
 
-import com.blackbaud.service.core.CosmosConfig;
 import com.blackbaud.boot.config.WebMvcRestServiceConfig;
 import com.blackbaud.service.core.CoreConfig;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +9,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @ComponentScan("com.blackbaud.service.resources")
-@Import({CosmosConfig.class, 
+@Import({
         CoreConfig.class,
         WebMvcRestServiceConfig.class,
 })

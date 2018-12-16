@@ -1,5 +1,6 @@
 package com.blackbaud.service.core;
 
+import com.blackbaud.service.core.CosmosConfig;
 import com.blackbaud.feign.JacksonFeignBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -8,7 +9,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @ComponentScan("com.blackbaud.service.core")
-@Import({
+@Import({CosmosConfig.class, 
     // TODO: import configurations here
 })
 public class CoreConfig {

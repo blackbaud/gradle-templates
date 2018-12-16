@@ -142,8 +142,8 @@ spring.datasource.validation-query=SELECT 1;
         buildFile.appendAfterLine('sharedTestCompile "com.blackbaud:common-deployable-spring-boot-rest-test:', '''\
     sharedTestCompile "com.blackbaud:common-deployable-spring-boot-cosmos-test:${commonSpringBootVersion}"''')
 
-        ProjectFile applicationClass = basicProject.findFile("${basicProject.serviceName}.java")
-        applicationClass.addConfigurationImport("${servicePackage}.core.CosmosConfig")
+        ProjectFile coreConfigClass = basicProject.findFile("CoreConfig.java")
+        coreConfigClass.addConfigurationImport("${servicePackage}.core.CosmosConfig")
     }
 
     private void addCosmosConfig() {

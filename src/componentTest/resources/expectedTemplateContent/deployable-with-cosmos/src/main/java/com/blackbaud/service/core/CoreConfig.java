@@ -9,8 +9,9 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @ComponentScan("com.blackbaud.service.core")
-@Import({CosmosConfig.class, 
-    // TODO: import configurations here
+@Import({
+        // TODO: import configurations here,
+        CosmosConfig.class
 })
 public class CoreConfig {
 

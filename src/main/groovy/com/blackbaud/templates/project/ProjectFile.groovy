@@ -4,6 +4,7 @@ package com.blackbaud.templates.project
 class ProjectFile extends File {
 
     public static final String LINE_SEPARATOR = System.getProperty("line.separator")
+    private static final String ANNOTATION_REGEX = /\s*\(\s*\{?([^})]+)\s*\}?\s*\)/
 
     ProjectFile(File file) {
         super(file.toURI())
@@ -49,12 +50,27 @@ import ${importToAdd}${eol}""")
     }
 
     private void addClassToAnnotation(String annotationName, String classToAdd) {
-        String text = this.text
         if (text.contains(/@${annotationName}/)) {
-            this.text = text.replaceFirst(/@${annotationName}\(\{?([^}]+)\}?\)/, "@${annotationName}({${classToAdd}, \$1})")
+            List<String> existingAnnotations = extractExistingAnnotations(annotationName)
+            if (existingAnnotations.contains(classToAdd) == false) {
+                String annotationsToReplace = (existingAnnotations + classToAdd).collect {
+                    "        ${it}"
+                }.join(",${LINE_SEPARATOR}")
+
+                this.text = text.replaceFirst(/@${annotationName}${ANNOTATION_REGEX}/,
+                                              "@${annotationName}({${LINE_SEPARATOR}${annotationsToReplace}${LINE_SEPARATOR}})")
+            }
         } else {
             appendBeforeLine(/class\s+/, "@${annotationName}(${classToAdd})")
         }
+    }
+
+    private List<String> extractExistingAnnotations(String annotationName) {
+        String text = this.text.replaceAll(/\s+/, ' ')
+        String regex = /.*@${annotationName}${ANNOTATION_REGEX}.*/
+        def matcher = text =~ regex
+        String annotations = matcher[0][1]
+        annotations.split(/\s*,\s*/).collect {it.trim()}
     }
 
     boolean addClassAnnotation(String annotation) {

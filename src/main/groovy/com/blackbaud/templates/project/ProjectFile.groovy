@@ -34,7 +34,13 @@ import ${importToAdd}${eol}""")
         }
     }
 
-    void addConfigurationImport(String importToAdd) {
+    void addConfigurationImport(String qualifiedClassName) {
+        addImport("org.springframework.context.annotation.Import")
+        addImport(qualifiedClassName)
+
+        int packageEnd = qualifiedClassName.lastIndexOf('.')
+        String importToAdd = qualifiedClassName.substring(packageEnd + 1) + ".class"
+
         addClassToAnnotation("Import", importToAdd)
     }
 

@@ -244,6 +244,9 @@ authorization.filter.enable=false
                                      '"com.blackbaud:common-deployable-spring-boot-jpa:${commonSpringBootVersion}"',
                                      ":common-deployable-spring-boot-rest:")
 
+        ProjectFile coreConfigClass = basicProject.findFile("CoreConfig.java")
+        coreConfigClass.addConfigurationImport("com.blackbaud.boot.jpa.JpaConfiguration")
+
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/core/domain") {
             "${resourceName}Entity.java" template: "/templates/springboot/rest/jpa/jpa-entity.java.tmpl",
                                          resourceName: resourceName, packageName: "${servicePackage}.core.domain", tableName: resourcePath

@@ -217,7 +217,7 @@ authorization.filter.enable=false
         testConfig.appendToClass("""
     @Bean
     public ${resourceName}Client ${resourceNameLowerCamel}Client() {
-        return testClientSupport.createClientWithTestToken(${resourceName}Client.class);
+        return testClientSupport.createClientWithBbAuthToken(${resourceName}Client.class);
     }
 """)
     }

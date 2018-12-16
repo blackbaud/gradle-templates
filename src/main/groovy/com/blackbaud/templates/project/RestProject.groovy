@@ -246,6 +246,7 @@ authorization.filter.enable=false
 
         ProjectFile coreConfigClass = basicProject.findFile("CoreConfig.java")
         coreConfigClass.addConfigurationImport("com.blackbaud.boot.jpa.JpaConfiguration")
+        coreConfigClass.addEntityScanAndEnableJpaRepositories("${servicePackage}.core.domain")
 
         basicProject.applyTemplate("src/main/java/${servicePackagePath}/core/domain") {
             "${resourceName}Entity.java" template: "/templates/springboot/rest/jpa/jpa-entity.java.tmpl",

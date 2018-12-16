@@ -49,6 +49,14 @@ import ${importToAdd}${eol}""")
         addClassToAnnotation("EnableConfigurationProperties", classToAdd)
     }
 
+    void addEntityScanAndEnableJpaRepositories(String packageName) {
+        addImport("org.springframework.boot.autoconfigure.domain.EntityScan")
+        addImport("org.springframework.data.jpa.repository.config.EnableJpaRepositories")
+
+        addClassToAnnotation("EntityScan", "\"${packageName}\"")
+        addClassToAnnotation("EnableJpaRepositories", "\"${packageName}\"")
+    }
+
     private void addClassToAnnotation(String annotationName, String classToAdd) {
         if (text.contains(/@${annotationName}/)) {
             List<String> existingAnnotations = extractExistingAnnotations(annotationName)
@@ -70,7 +78,7 @@ import ${importToAdd}${eol}""")
         String regex = /.*@${annotationName}${ANNOTATION_REGEX}.*/
         def matcher = text =~ regex
         String annotations = matcher[0][1]
-        annotations.split(/\s*,\s*/).collect {it.trim()}
+        annotations.split(/\s*,\s*/).collect { it.trim() }
     }
 
     boolean addClassAnnotation(String annotation) {
@@ -153,8 +161,7 @@ import ${importToAdd}${eol}""")
             if (text.contains("${key}=${value}") == false) {
                 addProperty("${LINE_SEPARATOR}${key}", value)
             }
-        }
-        else {
+        } else {
             addProperty("${LINE_SEPARATOR}${key}", value)
         }
     }

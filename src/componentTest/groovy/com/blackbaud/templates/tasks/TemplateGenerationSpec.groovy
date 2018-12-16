@@ -402,4 +402,19 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         then:
         greenwashOrAssertExpectedContent(basicProject, "add-consumer-pact-sas-spec")
     }
+
+    def "should add multiple CoreConfig annotations"() {
+        given:
+        RestProject restProject = initRestProject()
+        restProject.initCosmos()
+
+        when:
+        restProject.addJpaEntityObject("Account")
+        restProject.addCosmosEntityObject("Truck", true)
+
+        then:
+        greenwashOrAssertExpectedContent(restProject, "add-multiple-coreconfig-annotations")
+    }
+
+
 }

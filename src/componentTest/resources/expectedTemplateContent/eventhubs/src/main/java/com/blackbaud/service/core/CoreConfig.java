@@ -8,9 +8,6 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @ComponentScan("com.blackbaud.service.core")
-@Import({
-    // TODO: import configurations here
-})
 public class CoreConfig {
 
     @Bean

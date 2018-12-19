@@ -10,6 +10,7 @@ buildscript {
 apply plugin: "blackbaud-internal"
 apply plugin: "blackbaud-templates"
 apply plugin: "integration-test"
+apply plugin: "com.blackbaud.dependencies"
 
 setGradleVersions()
 println "Using gradle version: ${gradleVersion}"
@@ -21,13 +22,8 @@ dependencies {
     compile 'org.eclipse.jgit:org.eclipse.jgit:4.0.2.201509141540-r'
 
     sharedTestCompile gradleTestKit()
-    sharedTestCompile ("com.blackbaud:gradle-internal-test:${gradleInternalMajorVersion}") {
-        exclude group: 'org.spockframework'
-    }
-    sharedTestCompile('org.spockframework:spock-core:1.2-groovy-2.4') {
-        exclude group: 'org.codehaus.groovy'
-    }
-    sharedTestCompile 'junit:junit:4.11'
+    sharedTestCompile "com.blackbaud:gradle-internal-test:${gradleInternalMajorVersion}"
+    sharedTestCompile "org.spockframework:spock-core"
 }
 
 check.dependsOn integrationTest

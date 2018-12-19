@@ -112,7 +112,7 @@ import ${importToAdd}${eol}""")
                     index = i
                 }
                 if (index != i) {
-                    lines.addAll(i, lineToAdd)
+                    lines.add(i, lineToAdd)
                     break
                 }
             }

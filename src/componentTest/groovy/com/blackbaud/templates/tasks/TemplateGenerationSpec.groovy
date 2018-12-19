@@ -163,7 +163,7 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         IntegrationTestProject integrationTestProject = new IntegrationTestProject(basicProject)
 
         when:
-        integrationTestProject.initIntegrationTestProject(false)
+        integrationTestProject.initIntegrationTestProject(true)
 
         then:
         greenwashOrAssertExpectedContent(basicProject.targetDir, "integration-test")

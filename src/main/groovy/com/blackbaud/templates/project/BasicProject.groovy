@@ -99,6 +99,8 @@ class BasicProject {
                     packageName: servicePackage,
                     className: testClassName
         }
+        File gradleSettingsFile = new File(repoDir, "settings.gradle")
+        gradleSettingsFile.createNewFile()
     }
 
     void initBlackbaudGradleWrapper() {

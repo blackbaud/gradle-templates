@@ -168,14 +168,14 @@ class AsyncProject {
         }
     }
 
-    private addTestProducerConnectionUrl(ProjectFile projectFile, ServiceBusNameResolver formatter) {
+    private addTestProducerConnectionUrl(ProjectFile projectFile, ServiceBusNameResolver formatter, String postfix = "") {
         projectFile.addProperty("servicebus.${formatter.topicNameKebabCase}.producer-connection-url",
-                                "Endpoint=sb://namespace.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2F${formatter.topicNameKebabCase}&sig=test&se=2147483646")
+                                "Endpoint=sb://namespace.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2F${formatter.topicNameKebabCase}&sig=test&se=2147483646${postfix}")
     }
 
-    private addTestConsumerConnectionUrl(ProjectFile projectFile, ServiceBusNameResolver formatter) {
+    private addTestConsumerConnectionUrl(ProjectFile projectFile, ServiceBusNameResolver formatter, String postfix = "") {
         projectFile.addProperty("servicebus.${formatter.topicNameKebabCase}.consumer-connection-url",
-                                "Endpoint=sb://namespace.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2F${formatter.topicNameKebabCase}%2Fsubscriptions%2Ftest&sig=test&se=2147483646")
+                                "Endpoint=sb://namespace.servicebus.windows.net/;SharedAccessSignature=SharedAccessSignature sr=amqp%3A%2F%2Ftest.servicebus.windows.net%2F${formatter.topicNameKebabCase}%2Fsubscriptions%2Ftest&sig=test&se=2147483646${postfix}")
     }
 
     private void addTopicToPropertiesFiles(ServiceBusNameResolver formatter, boolean sessionEnabled, boolean publisher, boolean consumer) {
@@ -192,13 +192,13 @@ class AsyncProject {
         if (publisher) {
             applicationVstsProdPropertiesFile.addProperty("servicebus.${formatter.topicNameKebabCase}.producer-connection-url",
                                                           "\${ServiceBus__${formatter.topicNameSnakeCase}__Send}")
-            addTestProducerConnectionUrl(applicationVstsTestPropertiesFile, formatter)
+            addTestProducerConnectionUrl(applicationVstsTestPropertiesFile, formatter, " // TODO: Create REX service bus topic and replace")
             addTestProducerConnectionUrl(applicationComponentTestPropertiesFile, formatter)
         }
         if (consumer) {
             applicationVstsProdPropertiesFile.addProperty("servicebus.${formatter.topicNameKebabCase}.consumer-connection-url",
                                                           "\${ServiceBus__${formatter.topicNameSnakeCase}__Listen}")
-            addTestConsumerConnectionUrl(applicationVstsTestPropertiesFile, formatter)
+            addTestConsumerConnectionUrl(applicationVstsTestPropertiesFile, formatter, " // TODO: Create REX service bus topic and replace")
             addTestConsumerConnectionUrl(applicationComponentTestPropertiesFile, formatter)
         }
     }

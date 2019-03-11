@@ -322,12 +322,11 @@ lombok.addLombokGeneratedAnnotation = true
 """)
         applyPlugin("pact")
 
-        buildFile.addDependency("sharedTestCompile", "au.com.dius:pact-jvm-consumer-groovy_2.11:3.4.1", "org.codehaus.groovy")
+        buildFile.addDependency("sharedTestCompile", 'com.blackbaud:common-deployable-spring-boot-rest-test:${commonSpringBootVersion}')
 
-        if (buildFile.text =~ /com.blackbaud:sasquatch-test:/ || sasProviderService == false) {
-            return
+        if (sasProviderService) {
+            buildFile.addDependency("sharedTestCompile", "com.blackbaud:sasquatch-test:2.+")
         }
-        buildFile.addDependency("sharedTestCompile", "com.blackbaud:sasquatch-test:2.+")
     }
 
     private addPactSpec(String providerServiceName, String objectTypeReturnedByProvider, boolean sasProviderService) {

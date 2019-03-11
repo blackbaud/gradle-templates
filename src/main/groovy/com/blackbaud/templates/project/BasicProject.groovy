@@ -310,7 +310,12 @@ lombok.addLombokGeneratedAnnotation = true
 
     void addConsumerPact(String providerServiceName, String objectTypeReturnedByProvider, boolean sasProviderService) {
         addPactDependenciesAndPlugin(sasProviderService)
-        addPactSpec(providerServiceName, objectTypeReturnedByProvider, sasProviderService)
+        addConsumerPactSpec(providerServiceName, objectTypeReturnedByProvider, sasProviderService)
+    }
+
+    void addProviderPact() {
+        addPactDependenciesAndPlugin(false)
+        addProviderPactSpecAndStateInitializer()
     }
 
     private addPactDependenciesAndPlugin(boolean sasProviderService) {
@@ -329,10 +334,10 @@ lombok.addLombokGeneratedAnnotation = true
         }
     }
 
-    private addPactSpec(String providerServiceName, String objectTypeReturnedByProvider, boolean sasProviderService) {
-        applyTemplate("src/test/groovy/${servicePackagePath.replace('-', '')}/pact") {
+    private addConsumerPactSpec(String providerServiceName, String objectTypeReturnedByProvider, boolean sasProviderService) {
+        applyTemplate("src/test/groovy/${servicePackagePath}/pact") {
             "${LOWER_HYPHEN.to(UPPER_CAMEL, providerServiceName)}PactSpec.groovy" template: "/templates/test/pact/sas-consumer-spec.groovy.tmpl",
-                                                        packageName: "${servicePackage.replace('-', '')}",
+                                                        packageName: "${servicePackage}",
                                                         consumerServiceName: serviceName,
                                                         objectName: objectTypeReturnedByProvider,
                                                         providerServiceNameUpperCamelCase: LOWER_HYPHEN.to(UPPER_CAMEL, providerServiceName),
@@ -342,4 +347,31 @@ lombok.addLombokGeneratedAnnotation = true
                                                         sasProviderService: sasProviderService
         }
     }
+
+    private addProviderPactSpecAndStateInitializer() {
+        String pactSrcPath = "src/componentTest/groovy/${servicePackagePath}/pact"
+
+        applyTemplate(pactSrcPath) {
+            "ProviderVerificationSpec.groovy" template: "/templates/test/pact/provider-spec.groovy.tmpl",
+                                              packageName: servicePackage,
+                                              pactServiceName: repoName
+        }
+
+        applyTemplate(pactSrcPath) {
+            "ProviderStateInitializer.groovy" template: "/templates/test/pact/provider-state-initializer.groovy.tmpl",
+                                              packageName: servicePackage
+        }
+
+        ProjectFile testConfig = findOptionalFile("ComponentTestConfig.java")
+        if (testConfig != null) {
+            testConfig.addImport("${servicePackage}.pact.ProviderStateInitializer")
+            testConfig.appendToClass("""
+    @Bean
+    public ProviderStateInitializer providerStateInitializer() {
+        return new ProviderStateInitializer();
+    }
+""")
+        }
+    }
+
 }

@@ -26,7 +26,11 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
     }
 
     private BasicProject initBasicProject() {
-        File serviceDir = new File(projectDir.root, "service")
+        initBasicProject("service")
+    }
+
+    private BasicProject initBasicProject(String repoName) {
+        File serviceDir = new File(projectDir.root, repoName)
         serviceDir.deleteDir()
         GitRepo repo = GitRepo.init(serviceDir)
         ProjectProps projectProps = new ProjectProps(project)
@@ -400,6 +404,17 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
 
         then:
         greenwashOrAssertExpectedContent(basicProject, "add-consumer-pact-sas-spec")
+    }
+
+    def "should add provider pact spec"() {
+        given:
+        BasicProject basicProject = initBasicProject("some-service")
+
+        when:
+        basicProject.addProviderPact()
+
+        then:
+        greenwashOrAssertExpectedContent(basicProject, "add-provider-pact-spec")
     }
 
     def "should add multiple CoreConfig annotations"() {

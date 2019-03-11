@@ -331,7 +331,7 @@ lombok.addLombokGeneratedAnnotation = true
     }
 
     private addPactSpec(String providerServiceName, String objectTypeReturnedByProvider, boolean sasProviderService) {
-        applyTemplate("src/test/groovy/${servicePackagePath.replace('-', '')}/pacttest") {
+        applyTemplate("src/test/groovy/${servicePackagePath.replace('-', '')}/pact") {
             "${LOWER_HYPHEN.to(UPPER_CAMEL, providerServiceName)}PactSpec.groovy" template: "/templates/test/pact/sas-consumer-spec.groovy.tmpl",
                                                         packageName: "${servicePackage.replace('-', '')}",
                                                         consumerServiceName: serviceName,

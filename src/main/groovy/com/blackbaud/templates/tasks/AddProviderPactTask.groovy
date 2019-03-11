@@ -1,6 +1,6 @@
 package com.blackbaud.templates.tasks
 
-import com.blackbaud.templates.project.BasicProject
+import com.blackbaud.templates.project.PactProject
 import org.gradle.api.tasks.TaskAction
 
 class AddProviderPactTask extends AbstractTemplateTask {
@@ -11,7 +11,8 @@ class AddProviderPactTask extends AbstractTemplateTask {
 
     @TaskAction
     void addProviderPact() {
-        BasicProject basicProject = openBasicProject()
-        basicProject.addProviderPact()
+        PactProject pactProject = new PactProject(openBasicProject())
+        pactProject.addProviderPact()
     }
+
 }

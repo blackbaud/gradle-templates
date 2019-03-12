@@ -45,4 +45,11 @@ class ProviderVerificationSpec extends BaseAuthPactProviderSpecification impleme
     ProviderPactInitializer getInitializer() {
         return this.providerStateInitializer
     }
+
+    @Override
+    String getLocalPath() {
+        // return a fully qualified path to a pact .json file to run your test with those local interactions
+        return null
+    }
+
 }

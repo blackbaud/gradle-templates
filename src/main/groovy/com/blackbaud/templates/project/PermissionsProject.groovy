@@ -8,6 +8,10 @@ class PermissionsProject {
     }
 
     void addPermissions() {
+        checkForRestClient()
+    }
 
+    private void checkForRestClient() {
+        basicProject.findFile("rest-client")
     }
 }

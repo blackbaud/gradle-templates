@@ -1,6 +1,7 @@
 package com.blackbaud.templates.tasks
 
 import com.blackbaud.gradle.test.AbstractProjectSpecification
+import com.blackbaud.templates.GitRepo
 import com.blackbaud.templates.project.AsyncProject
 import com.blackbaud.templates.project.BasicProject
 import com.blackbaud.templates.project.EventHubsProject
@@ -8,11 +9,11 @@ import com.blackbaud.templates.project.IntegrationTestProject
 import com.blackbaud.templates.project.KafkaProject
 import com.blackbaud.templates.project.PactProject
 import com.blackbaud.templates.project.PerformanceTestsProject
+import com.blackbaud.templates.project.PermissionsProject
+import com.blackbaud.templates.project.ProjectProps
 import com.blackbaud.templates.project.RestProject
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
-import com.blackbaud.templates.GitRepo
-import com.blackbaud.templates.project.ProjectProps
 
 class TemplateGenerationSpec extends AbstractProjectSpecification {
 
@@ -434,5 +435,15 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         greenwashOrAssertExpectedContent(restProject, "add-multiple-coreconfig-annotations")
     }
 
+    def "should thrown an exception if addPermissions task is called on a project that doesn't have a rest-client"() {
+        given:
+        BasicProject basicProject = initBasicProject()
+        PermissionsProject permissionsProject = new PermissionsProject(basicProject)
 
+        when:
+        permissionsProject.addPermissions()
+
+        then:
+        thrown(Exception)
+    }
 }

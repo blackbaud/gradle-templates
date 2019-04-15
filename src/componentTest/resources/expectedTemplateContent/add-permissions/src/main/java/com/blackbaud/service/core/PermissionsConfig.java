@@ -1,6 +1,7 @@
-package com.blackbaud.service.permissions;
+package com.blackbaud.service.core;
 
-import com.blackbaud.security.permission.PermissionRegistry;
+import com.blackbaud.security.permission.PermissionsRegistry;
+import com.blackbaud.service.permissions.ServicePermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,7 +15,7 @@ public class PermissionsConfig {
     @PostConstruct
     private void registerPermissions() {
         permissionsRegistry.registerPermissionConfiguration(
-                new ServicePermission()
-        )
+            new ServicePermissions()
+        );
     }
 }

@@ -1,0 +1,14 @@
+package ${packageName}.permissions;
+
+import com.blackbaud.security.permission.AbstractPermissions;
+
+import java.util.Map;
+
+public class ${serviceName}Permissions extends AbstractPermissions {
+    @Override
+    protected void initPermissions(Map<String, Long> permissions) {
+        permissions.put("${servicePermissionPrefix}.view", 1L);
+        permissions.put("${servicePermissionPrefix}.edit", 2L);
+        permissions.put("${servicePermissionPrefix}.delete", 3L);
+    }
+}

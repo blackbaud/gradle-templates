@@ -1,0 +1,9 @@
+ext.artifactId = "${artifactId}-rest-client"
+
+dependencies {
+    compileOnly "com.blackbaud:common-deployable-spring-boot-rest:${commonSpringBootVersion}"
+}
+
+publishing_ext {
+    publication('mainTest')
+}

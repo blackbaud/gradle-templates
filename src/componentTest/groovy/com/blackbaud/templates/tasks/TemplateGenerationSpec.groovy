@@ -446,4 +446,19 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         then:
         thrown(Exception)
     }
+
+    def "should add permissions"() {
+        given:
+        RestProject restProject = initRestProject()
+        PermissionsProject permissionsProject = new PermissionsProject(restProject.basicProject)
+
+        when:
+        restProject.createResource("resource", false, false)
+
+        and:
+        permissionsProject.addPermissions()
+
+        then:
+        greenwashOrAssertExpectedContent(restProject, "add-permissions")
+    }
 }

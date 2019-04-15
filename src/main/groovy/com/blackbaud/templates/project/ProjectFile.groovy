@@ -36,8 +36,14 @@ import ${importToAdd}${eol}""")
     }
 
     void addConfigurationImport(String qualifiedClassName) {
+        addConfigurationImport(qualifiedClassName, false)
+    }
+
+    void addConfigurationImport(String qualifiedClassName, boolean isSamePackage) {
         addImport("org.springframework.context.annotation.Import")
-        addImport(qualifiedClassName)
+        if (isSamePackage == false) {
+            addImport(qualifiedClassName)
+        }
 
         int packageEnd = qualifiedClassName.lastIndexOf('.')
         String importToAdd = qualifiedClassName.substring(packageEnd + 1) + ".class"

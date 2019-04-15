@@ -7,8 +7,6 @@ import com.google.common.io.Resources
 import org.gradle.api.GradleException
 
 import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.attribute.FileAttribute
 import java.nio.file.attribute.PosixFilePermission
 import java.nio.file.attribute.PosixFilePermissions
 

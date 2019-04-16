@@ -1,7 +1,6 @@
 package com.blackbaud.templates.tasks
 
-
-import com.blackbaud.templates.project.PermissionsProject
+import com.blackbaud.templates.project.RestProject
 import org.gradle.api.tasks.TaskAction
 
 class AddPermissionsTask extends AbstractTemplateTask {
@@ -11,7 +10,7 @@ class AddPermissionsTask extends AbstractTemplateTask {
 
     @TaskAction
     void addPermissions() {
-        PermissionsProject permissionsProject = new PermissionsProject(openBasicProject())
-        permissionsProject.addPermissions()
+        RestProject restProject = new RestProject(openBasicProject())
+        restProject.addPermissions()
     }
 }

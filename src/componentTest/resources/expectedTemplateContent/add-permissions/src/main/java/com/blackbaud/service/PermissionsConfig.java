@@ -1,4 +1,4 @@
-package com.blackbaud.service.core;
+package com.blackbaud.service;
 
 import com.blackbaud.security.permission.PermissionsRegistry;
 import com.blackbaud.service.permissions.ServicePermissions;
@@ -14,8 +14,6 @@ public class PermissionsConfig {
 
     @PostConstruct
     private void registerPermissions() {
-        permissionsRegistry.registerPermissionConfiguration(
-            new ServicePermissions()
-        );
+        permissionsRegistry.registerPermissionConfiguration(new ServicePermissions());
     }
 }

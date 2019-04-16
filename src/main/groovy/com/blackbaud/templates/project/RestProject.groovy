@@ -326,4 +326,36 @@ authorization.filter.enable=false
         addRandomBuilder(entityName)
     }
 
+    void addPermissions() {
+        checkForRestClient()
+        addPermissionsToRestClient()
+        addPermissionsConfig()
+        addPermissionsConfigToMainClass()
+    }
+
+    private void checkForRestClient() {
+        basicProject.getProjectFileOrFail("rest-client")
+    }
+
+    private void addPermissionsToRestClient() {
+        basicProject.applyTemplate("rest-client/src/main/java/${servicePackagePath}/permissions") {
+            "${serviceName}Permissions.java" template: "/templates/springboot/rest/permissions/service-permissions.java.tmpl",
+                                             packageName: servicePackage,
+                                             serviceName: serviceName,
+                                             servicePermissionPrefix: LOWER_HYPHEN.to(LOWER_CAMEL, basicProject.repoName)
+        }
+    }
+
+    private void addPermissionsConfig() {
+        basicProject.applyTemplate("src/main/java/${servicePackagePath}") {
+            "PermissionsConfig.java" template: "/templates/springboot/rest/permissions/permissions-config.java.tmpl",
+                                     packageName: servicePackage,
+                                     serviceName: serviceName
+        }
+    }
+
+    private void addPermissionsConfigToMainClass() {
+        ProjectFile coreConfigClass = basicProject.findFile("${serviceName}.java")
+        coreConfigClass.addConfigurationImport("${servicePackage}.PermissionsConfig", true)
+    }
 }

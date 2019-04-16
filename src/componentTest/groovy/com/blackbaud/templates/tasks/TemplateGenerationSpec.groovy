@@ -9,7 +9,6 @@ import com.blackbaud.templates.project.IntegrationTestProject
 import com.blackbaud.templates.project.KafkaProject
 import com.blackbaud.templates.project.PactProject
 import com.blackbaud.templates.project.PerformanceTestsProject
-import com.blackbaud.templates.project.PermissionsProject
 import com.blackbaud.templates.project.ProjectProps
 import com.blackbaud.templates.project.RestProject
 import org.junit.Rule
@@ -437,11 +436,10 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
 
     def "should throw an exception if addPermissions task is called on a project that doesn't have a rest-client"() {
         given:
-        BasicProject basicProject = initBasicProject()
-        PermissionsProject permissionsProject = new PermissionsProject(basicProject)
+        RestProject restProject = initRestProject()
 
         when:
-        permissionsProject.addPermissions()
+        restProject.addPermissions()
 
         then:
         thrown(Exception)
@@ -450,13 +448,12 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
     def "should add permissions"() {
         given:
         RestProject restProject = initRestProject()
-        PermissionsProject permissionsProject = new PermissionsProject(restProject.basicProject)
 
         when:
         restProject.createResource("resource", false, false)
 
         and:
-        permissionsProject.addPermissions()
+        restProject.addPermissions()
 
         then:
         greenwashOrAssertExpectedContent(restProject, "add-permissions")

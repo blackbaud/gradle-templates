@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 @Import({
         CoreConfig.class,
         WebMvcRestServiceConfig.class,
+        PermissionsConfig.class
 })
 public class Service {
 

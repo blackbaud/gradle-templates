@@ -435,7 +435,7 @@ class TemplateGenerationSpec extends AbstractProjectSpecification {
         greenwashOrAssertExpectedContent(restProject, "add-multiple-coreconfig-annotations")
     }
 
-    def "should thrown an exception if addPermissions task is called on a project that doesn't have a rest-client"() {
+    def "should throw an exception if addPermissions task is called on a project that doesn't have a rest-client"() {
         given:
         BasicProject basicProject = initBasicProject()
         PermissionsProject permissionsProject = new PermissionsProject(basicProject)

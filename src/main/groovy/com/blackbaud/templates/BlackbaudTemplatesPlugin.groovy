@@ -25,6 +25,7 @@ import com.blackbaud.templates.tasks.AddEventHubsMessageTask
 import com.blackbaud.templates.tasks.AddKafkaMessageTask
 import com.blackbaud.templates.tasks.AddLombokConfigTask
 import com.blackbaud.templates.tasks.AddPerformanceTestsTask
+import com.blackbaud.templates.tasks.AddPermissionsTask
 import com.blackbaud.templates.tasks.AddProviderPactTask
 import com.blackbaud.templates.tasks.AddRestApiObjectTask
 import com.blackbaud.templates.tasks.AddJpaObjectTask
@@ -73,6 +74,7 @@ class BlackbaudTemplatesPlugin implements Plugin<Project> {
         project.task 'addLombokConfig', type: AddLombokConfigTask
         project.task 'addConsumerPact', type: AddConsumerPactTask
         project.task 'addProviderPact', type: AddProviderPactTask
+        project.task 'addPermissions', type: AddPermissionsTask
     }
 
 }

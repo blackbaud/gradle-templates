@@ -1,3 +1,6 @@
+# This Repo Is Deprecated
+The project has been moved to VSTS, https://blackbaud.visualstudio.com/Products/_git/gradle-templates
+
 # Blackbaud Project Templates
 
 This project is used to bootstrap new projects as well as adding to existing projects.  

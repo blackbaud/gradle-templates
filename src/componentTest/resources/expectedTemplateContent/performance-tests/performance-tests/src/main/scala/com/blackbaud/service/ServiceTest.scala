@@ -1,4 +1,4 @@
-package ${packageName}
+package com.blackbaud.service
 
 import com.blackbaud.gatling.bbauth.BBAuthHelper
 import com.blackbaud.gatling.SimulationConfiguration
@@ -10,7 +10,7 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class ${className} extends SimulationConfiguration {
+class ServiceTest extends SimulationConfiguration {
 
   var baseURL = ""
   var requestName = ""

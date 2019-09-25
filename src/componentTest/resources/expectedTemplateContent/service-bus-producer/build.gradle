@@ -17,7 +17,7 @@ allprojects {
     apply plugin: "blackbaud-internal"
 
     ext {
-        commonAsyncServiceBusVersion = "3.+"
+        commonAsyncServiceBusVersion = "5.+"
         // used by the various gradle-templates task to determine the base service package
         servicePackageName="com.blackbaud.service"
 

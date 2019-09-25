@@ -22,7 +22,7 @@ allprojects {
 
         commonDeployableVersion = "0.+"
         commonSpringBootVersion = "${springBootVersion}-${commonDeployableVersion}"
-        commonAsyncEventHubsVersion = "3.+"
+        commonAsyncEventHubsVersion = "5.+"
     }
 
     dependencies {

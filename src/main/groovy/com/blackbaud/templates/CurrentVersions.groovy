@@ -12,7 +12,7 @@ class CurrentVersions {
     static final String COMMON_DEPLOYABLE_MAJOR_VERSION = "0"
     static final String COMMON_TEST_MAJOR_VERSION = "4"
     static final String COMMON_GEB_MAJOR_VERSION = "3"
-    static final String COMMON_SERVICE_BUS_MAJOR_VERSION = "3"
+    static final String COMMON_SERVICE_BUS_MAJOR_VERSION = "5"
     static final String COMMON_EVENT_HUBS_MAJOR_VERSION = "4"
     static final String COMMON_KAFKA_API_MAJOR_VERSION = "2"
     static final String COMMON_KAFKA_MAJOR_VERSION = "4"
